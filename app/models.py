@@ -63,4 +63,26 @@ class User(BaseModel):
         return Bcrypt().check_password_hash(self.password, password)
 
 
+class Business(BaseModel):
+    """This class defines the users table"""
 
+    __tablename__ = 'business'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(256), nullable=False)
+    category = db.Column(db.String(100), nullable=False)
+    location = db.Column(db.String(100), nullable=False)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_modified = db.Column(
+        db.DateTime, default=db.func.current_timestamp(),
+        onupdate=db.func.current_timestamp())
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+
+    def __init__(self, name, description, category, location, user_id):
+        """Initialize the user with the user details"""
+        self.name = name
+        self.description = description
+        self.category = category
+        self.location = location
+        self.user_id = user_id
