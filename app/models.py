@@ -47,7 +47,7 @@ class User(BaseModel):
     password = db.Column(db.String(256), nullable=False)
     registered_on = db.Column(db.DateTime, default=db.func.current_timestamp())
     last_login = db.Column(db.DateTime, default=db.func.current_timestamp())
-    admin = db.Column(db.Boolean, nullable=False, default=False)
+    admin = db.Column(db.Boolean, default=False)
 
     def __init__(self, email, username, password, admin=False):
         """Initialize the user with the user details"""
@@ -62,9 +62,12 @@ class User(BaseModel):
         """Check the password against its hash"""
         return Bcrypt().check_password_hash(self.password, password)
 
+    def __repr__(self):
+        return 'user: {}'.format(self.username)
+
 
 class Business(BaseModel):
-    """This class defines the users table"""
+    """This class defines the business table"""
 
     __tablename__ = 'business'
 
@@ -77,7 +80,34 @@ class Business(BaseModel):
     date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    user_id = db.Column(db.Integer, db.ForeignKey(user.id), nullable=False)
+
+    def __init__(self, name, description, category, location, user_id):
+        """Initialize the business with the businesses details"""
+        self.name = name
+        self.description = description
+        self.category = category
+        self.location = location
+        self.user_id = user_id
+    
+    def __repr__(self):
+        return 'business: {}'.format(self.name)
+
+
+class Review(BaseModel):
+    """This class defines the review table"""
+
+    __tablename__ = 'business'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    description = db.Column(db.String(256), nullable=False)
+    rating = db.Column(db.Integer, default=1)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_modified = db.Column(
+        db.DateTime, default=db.func.current_timestamp(),
+        onupdate=db.func.current_timestamp())
+    business_id = db.Column(db.Integer, db.ForeignKey(business.id), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(user.id), nullable=False)
 
     def __init__(self, name, description, category, location, user_id):
         """Initialize the user with the user details"""
@@ -86,3 +116,23 @@ class Business(BaseModel):
         self.category = category
         self.location = location
         self.user_id = user_id
+
+    def __repr__(self):
+        return 'review: {}'.format(self.description)
+
+
+class BlacklistToken(BaseModel):
+    """This class defines the review table"""
+
+    __tablename__ = 'blacklist_token'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    token = db.Column(db.String(500), unique=True, nullable=False)
+    blacklisted_on = db.Column(db.DateTime, nullable=False)
+
+    def __init__(self, token):
+        self.token = token
+        self.blacklisted_on = datetime.datetime.now()
+
+    def __repr__(self):
+        return 'token: {}'.format(self.token)
