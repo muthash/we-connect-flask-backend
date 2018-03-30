@@ -72,7 +72,7 @@ class Business(BaseModel):
     date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     reviews = db.relationship('Review', backref='belongs', cascade="all, delete-orphan", lazy=True)
 
     def __init__(self, name, description, category, location, user_id):
@@ -100,7 +100,7 @@ class Review(BaseModel):
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     def __init__(self, name, description, category, location, user_id):
         """Initialize the user with the user details"""
