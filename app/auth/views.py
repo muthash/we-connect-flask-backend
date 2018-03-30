@@ -1,6 +1,10 @@
 """Contains views to register, login and logout user"""
+import datetime
 from flask import Blueprint, request, jsonify
 from flask.views import MethodView
+from flask_jwt_extended import (
+    create_access_token, create_refresh_token
+)
 from app.models import User
 from app.utils import validate_email, validate_null
 
@@ -56,7 +60,12 @@ class LoginUser(MethodView):
         if validate_email(email):
             user = user = User.query.filter_by(email=email).first()
             if user and user.password_is_valid(password):
-                response = {'message': 'Login successfull'}
+                expires = datetime.timedelta(minutes=5)
+                response = {
+                    'message': 'Login successfull',
+                    'access_token': create_access_token(identity=user.id, fresh=False, expires_delta=expires),
+                    'refresh_token': create_refresh_token(identity=user.id)
+                }
                 return jsonify(response), 200
 
 
