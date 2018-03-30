@@ -20,5 +20,7 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
     db.init_app(app)
 
+    from app.auth.views import auth
+    app.register_blueprint(auth)
 
     return app
