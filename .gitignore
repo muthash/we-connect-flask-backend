@@ -3,3 +3,4 @@ myenv
 **/__Pycache__/*
 .coverage
 htmlcov/
+pylintrc
