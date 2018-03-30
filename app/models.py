@@ -1,39 +1,29 @@
 import datetime
 
-from app import db
 from flask_bcrypt import Bcrypt
+from app import db
 
 
 class BaseModel(db.Model):
-    """Base model fromwhich all other models will inherit from"""
+    """Base model from which all other models will inherit from"""
+    __abstract__ = True
+
     def save(self):
         """Save a user to the database"""
-        try:   
-            db.session.add(self)
-            db.session.commit()
-
-        except Exception:
-            db.session.rollback()
+        db.session.add(self)
+        db.session.commit()
 
     def delete(self):
         """Deletes a given user"""
-        try:   
-            db.session.delete(self)
-            db.session.commit()
+        db.session.delete(self)
+        db.session.commit()
 
-        except Exception:
-            db.session.rollback()
-
-    def update(self, id, **kwargs):
+    def update(self, table_id, **kwargs):
         """Update selected columns in given row"""
-        row_to_update = User.query.filter_by(id=id).first()
-        try:
-            for key, value in kwargs.items():
-                setattr(row_to_update, key, value)
-            db.session.commit()
-
-        except Exception:
-            db.session.rollback()
+        row_to_update = User.query.filter_by(id=table_id).first()
+        for key, value in kwargs.items():
+            setattr(row_to_update, key, value)
+        db.session.commit()
 
 
 class User(BaseModel):
@@ -48,6 +38,8 @@ class User(BaseModel):
     registered_on = db.Column(db.DateTime, default=db.func.current_timestamp())
     last_login = db.Column(db.DateTime, default=db.func.current_timestamp())
     admin = db.Column(db.Boolean, default=False)
+    business_ = db.relationship('Business', backref='owner', cascade="all, delete-orphan", lazy=True)
+    user_reviews = db.relationship('Review', backref='reviewer', cascade="all, delete-orphan", lazy=True)
 
     def __init__(self, email, username, password, admin=False):
         """Initialize the user with the user details"""
@@ -80,7 +72,8 @@ class Business(BaseModel):
     date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
-    user_id = db.Column(db.Integer, db.ForeignKey(user.id), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    reviews = db.relationship('Review', backref='belongs', cascade="all, delete-orphan", lazy=True)
 
     def __init__(self, name, description, category, location, user_id):
         """Initialize the business with the businesses details"""
@@ -97,7 +90,7 @@ class Business(BaseModel):
 class Review(BaseModel):
     """This class defines the review table"""
 
-    __tablename__ = 'business'
+    __tablename__ = 'reviews'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     description = db.Column(db.String(256), nullable=False)
@@ -106,8 +99,8 @@ class Review(BaseModel):
     date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
-    business_id = db.Column(db.Integer, db.ForeignKey(business.id), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey(user.id), nullable=False)
+    business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __init__(self, name, description, category, location, user_id):
         """Initialize the user with the user details"""
