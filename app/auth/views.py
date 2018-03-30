@@ -3,9 +3,10 @@ import datetime
 from flask import Blueprint, request, jsonify
 from flask.views import MethodView
 from flask_jwt_extended import (
-    create_access_token, create_refresh_token
+    create_access_token, create_refresh_token,get_raw_jwt,
+    jwt_required
 )
-from app.models import User
+from app.models import User, BlacklistToken
 from app.utils import validate_email, validate_null
 
 auth = Blueprint('auth', __name__, url_prefix='/api/v1')
@@ -42,7 +43,7 @@ class RegisterUser(MethodView):
 
 
 class LoginUser(MethodView):
-    """Method to login a new user"""
+    """Method to login a user"""
     def post(self):
         """Endpoint to login a user"""
         if not request.get_json():
@@ -58,13 +59,12 @@ class LoginUser(MethodView):
             return jsonify(response), 400
 
         if validate_email(email):
-            user = user = User.query.filter_by(email=email).first()
+            user = User.query.filter_by(email=email).first()
             if user and user.password_is_valid(password):
-                expires = datetime.timedelta(minutes=5)
+                expires = datetime.timedelta(hours=1)
                 response = {
                     'message': 'Login successfull',
-                    'access_token': create_access_token(identity=user.id, fresh=False, expires_delta=expires),
-                    'refresh_token': create_refresh_token(identity=user.id)
+                    'access_token': create_access_token(identity=user.id, fresh=False, expires_delta=expires)
                 }
                 return jsonify(response), 200
             response = {'message':'Invalid email or password, Please try again'}
@@ -73,5 +73,18 @@ class LoginUser(MethodView):
         return jsonify(response), 400
 
 
+class LogoutUser(MethodView):
+    """Method to logout a user"""
+    @jwt_required
+    def post(self):
+        """Endpoint to logout a user"""
+        jti = get_raw_jwt()['jti']
+        blacklist = BlacklistToken(token=jti)
+        blacklist.save()
+        response = {'message': 'Successfully logged out'}
+        return jsonify(response), 200
+
+
 auth.add_url_rule('/register', view_func=RegisterUser.as_view('register'))
 auth.add_url_rule('/login', view_func=LoginUser.as_view('login'))
+auth.add_url_rule('/logout', view_func=LogoutUser.as_view('logout'))
