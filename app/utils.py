@@ -16,14 +16,10 @@ def validate_null(**kwargs):
         if kwargs[key] is None:
             message = 'Please enter your {}'.format(key)
             messages.append(message)
+        else:
+            strip_text = re.sub(r'\s+', '', kwargs[key])
+            if not strip_text:
+                message = 'Please enter your {}'.format(key)
+                messages.append(message)
     return messages
 
-def validate_empty_text(**kwargs):
-    """This function is used to validate whitespace input"""
-    messages = []
-    for key in kwargs:
-        strip_text = re.sub(r'\s+', '', kwargs[key])
-        if not strip_text:
-            message = 'Please enter your {}'.format(key)
-            messages.append(message)
-    return messages
