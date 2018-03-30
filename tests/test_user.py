@@ -31,3 +31,4 @@ class AuthTestCase(BaseTestCase):
         self.assertEqual(result['message'], "Login successfull")
         self.assertEqual(res.status_code, 200)
         self.assertTrue(result['access_token'])
+        self.assertTrue(result['refresh_token'])
