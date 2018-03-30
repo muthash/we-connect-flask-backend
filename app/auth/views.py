@@ -67,6 +67,10 @@ class LoginUser(MethodView):
                     'refresh_token': create_refresh_token(identity=user.id)
                 }
                 return jsonify(response), 200
+            response = {'message':'Invalid email or password, Please try again'}
+            return jsonify(response), 401
+        response = {'message': 'Please enter a valid email address'}
+        return jsonify(response), 400
 
 
 auth.add_url_rule('/register', view_func=RegisterUser.as_view('register'))
