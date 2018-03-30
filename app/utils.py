@@ -22,4 +22,3 @@ def validate_null(**kwargs):
                 message = 'Please enter your {}'.format(key)
                 messages.append(message)
     return messages
-
