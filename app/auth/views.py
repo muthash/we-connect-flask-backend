@@ -2,7 +2,7 @@
 from flask import Blueprint, request, jsonify
 from flask.views import MethodView
 from app.models import User
-from app.utils import validate_email, validate_null, validate_empty_text
+from app.utils import validate_email, validate_null
 
 auth = Blueprint('auth', __name__, url_prefix='/api/v1')
 
@@ -25,11 +25,6 @@ class RegisterUser(MethodView):
         null_input = validate_null(email=email, username=username, password=password)
         if null_input:
             response = {'message': null_input}
-            return jsonify(response), 400
-
-        empty_input = validate_empty_text(username=username, password=password)
-        if empty_input:
-            response = {'message': empty_input}
             return jsonify(response), 400
 
         if validate_email(email):
