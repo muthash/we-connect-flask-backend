@@ -6,7 +6,7 @@ from tests.test_base import BaseTestCase
 class AuthTestCase(BaseTestCase):
     """Test case for the user"""
     def test_registration(self):
-        """Test user registration works correcty."""
+        """Test user registration works correcty"""
         res = self.register_user()
         self.assertTrue(res.content_type == 'application/json')
         result = json.loads(res.data.decode())
@@ -14,7 +14,7 @@ class AuthTestCase(BaseTestCase):
         self.assertEqual(res.status_code, 201)
 
     def test_already_registered_user(self):
-        """Test that a user cannot be registered twice."""
+        """Test that a user cannot be registered twice"""
         self.register_user()
         second_res = self.register_user()
         self.assertTrue(second_res.content_type == 'application/json')
@@ -23,7 +23,7 @@ class AuthTestCase(BaseTestCase):
         self.assertEqual(second_res.status_code, 409)
 
     def test_user_login(self):
-        """Test registered user can login."""
+        """Test registered user can login"""
         self.register_user()
         res = self.login_user()
         self.assertTrue(res.content_type == 'application/json')
@@ -32,3 +32,11 @@ class AuthTestCase(BaseTestCase):
         self.assertEqual(res.status_code, 200)
         self.assertTrue(result['access_token'])
         self.assertTrue(result['refresh_token'])
+
+    def test_unregistered_user_login(self):
+        """Test unregistered user cannot login"""
+        login_res = self.login_user('muthama@gmail.com', 'mypassword')
+        result = json.loads(login_res.data.decode())
+        self.assertEqual(result['message'], "Invalid email or password, " +
+                         "Please try again")
+        self.assertEqual(login_res.status_code, 401)
