@@ -31,7 +31,6 @@ class AuthTestCase(BaseTestCase):
         self.assertEqual(result['message'], "Login successfull")
         self.assertEqual(res.status_code, 200)
         self.assertTrue(result['access_token'])
-        self.assertTrue(result['refresh_token'])
 
     def test_unregistered_user_login(self):
         """Test unregistered user cannot login"""
@@ -40,3 +39,16 @@ class AuthTestCase(BaseTestCase):
         self.assertEqual(result['message'], "Invalid email or password, " +
                          "Please try again")
         self.assertEqual(login_res.status_code, 401)
+
+    def test_logout_user(self):
+        """Test if logged in user can logout"""
+        self.register_user()
+        res = self.login_user()
+        access_token = json.loads(res.data.decode())['access_token']
+        logout_res = self.client.post(
+            '/api/v1/logout',
+            headers={'Content-Type': 'application/json',
+                     'Authorization': 'Bearer ' + access_token})
+        result = json.loads(logout_res.data.decode())
+        self.assertEqual(result['message'], "Successfully logged out")
+        self.assertEqual(logout_res.status_code, 200)
