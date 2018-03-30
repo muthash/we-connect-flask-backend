@@ -24,11 +24,19 @@ def create_app(config_name):
     jwt.init_app(app)
 
     from app.auth.views import auth
+    from app.models import BlacklistToken
 
     @app.errorhandler(405)
     def method_not_allowed(error):
         """Error handler for wrong method to an endpoint"""
         return jsonify({'message':'Method not allowed'}), 405
+
+    @jwt.token_in_blacklist_loader
+    def check_if_token_in_blacklist(decrypted_token):
+        """Check if token is blacklisted"""
+        jti = decrypted_token['jti']
+        blacklist = BlacklistToken.query.all()
+        return jti in blacklist
 
     app.register_blueprint(auth)
 
