@@ -20,6 +20,7 @@ class Config(object):
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_TOKEN_CHECKS = 'access'
 
 class DevelopmentConfig(Config):
     """Configurations for Development"""
