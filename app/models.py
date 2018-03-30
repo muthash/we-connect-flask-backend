@@ -9,20 +9,22 @@ class BaseModel(db.Model):
     __abstract__ = True
 
     def save(self):
-        """Save a user to the database"""
+        """Save the given object to the database"""
         db.session.add(self)
         db.session.commit()
 
-    def delete(self):
-        """Deletes a given user"""
-        db.session.delete(self)
+    @staticmethod
+    def delete(row_id):
+        """Deletes a given object"""
+        db.session.delete(row_id)
         db.session.commit()
 
-    def update(self, table_id, **kwargs):
-        """Update selected columns in given row"""
-        row_to_update = User.query.filter_by(id=table_id).first()
-        for key, value in kwargs.items():
-            setattr(row_to_update, key, value)
+    @staticmethod
+    def update(table_name, row_id, **kwargs):
+        """Update selected columns in given row in a table"""
+        row = table_name.query.filter_by(id=row_id).first()
+        for column, value in kwargs.items():
+            setattr(row, column, value)
         db.session.commit()
 
 
@@ -82,7 +84,7 @@ class Business(BaseModel):
         self.category = category
         self.location = location
         self.user_id = user_id
-    
+
     def __repr__(self):
         return 'business: {}'.format(self.name)
 
