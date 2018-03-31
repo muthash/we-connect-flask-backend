@@ -3,7 +3,8 @@ import datetime, uuid
 from flask import Blueprint, request, jsonify
 from flask.views import MethodView
 from flask_jwt_extended import (
-    create_access_token, get_raw_jwt, jwt_required
+    create_access_token, get_raw_jwt, jwt_required,
+    fresh_jwt_required
 )
 from flask_bcrypt import Bcrypt
 from app.models import User, BlacklistToken
@@ -63,12 +64,20 @@ class LoginUser(MethodView):
         if validate_email(email):
             user = User.query.filter_by(email=email).first()
             if user and user.password_is_valid(password):
-                expires = datetime.timedelta(hours=1)
-                response = {
-                    'message': 'Login successfull',
-                    'access_token': create_access_token(identity=user.id, fresh=False, expires_delta=expires)
-                }
-                return jsonify(response), 200
+                if not user.update_pass:
+                    expires = datetime.timedelta(hours=1)
+                    response = {
+                        'message': 'Login successfull',
+                        'access_token': create_access_token(identity=user.id, fresh=False, expires_delta=expires)
+                    }
+                    return jsonify(response), 200
+                else:
+                    expires = datetime.timedelta(minutes=5)
+                    response = {
+                        'message': 'Change your password inorder to continue',
+                        'access_token': create_access_token(identity=user.id, fresh=True, expires_delta=expires)
+                    }
+                    return jsonify(response), 200
             response = {'message':'Invalid email or password, Please try again'}
             return jsonify(response), 401
         response = {'message': 'Please enter a valid email address'}
@@ -120,6 +129,19 @@ class ResetPassword(MethodView):
             return jsonify(response), 400
         response = {'message': 'Please enter a valid email address'}
         return jsonify(response), 400
+
+
+class ChangePassword(MethodView):
+    """Method to change a user password"""
+    @fresh_jwt_required
+    def post(self):
+        """Endpoint to change a user password"""
+        if not request.get_json():
+            response = {'error':'Bad Request. Request should be JSON format'}
+            return jsonify(response), 400
+        data = request.get_json()
+        old_password = data.get('old_password')
+        new_password = data.get('new_password')
 
 
 auth.add_url_rule('/register', view_func=RegisterUser.as_view('register'))
