@@ -51,6 +51,12 @@ def create_app(config_name):
         blacklist = BlacklistToken.query.all()
         return jti in blacklist
 
+    @jwt.needs_fresh_token_loader
+    def generate_fresh_token():
+        """Redirect user to get fresh token"""
+        response = {'message':'Login in to continue'}
+        return jsonify(response), 200
+
     app.register_blueprint(auth)
 
     return app
