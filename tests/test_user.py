@@ -74,3 +74,19 @@ class AuthTestCase(BaseTestCase):
         result_c = json.loads(change_res.data.decode())
         self.assertEqual(result_c['message'], "Password changed successfully")
         self.assertEqual(change_res.status_code, 200)
+
+    def test_delete_account(self):
+        """Test deleting account"""
+        self.register_user()
+        login_res = self.login_user()
+        result = json.loads(login_res.data.decode())
+        self.header['Authorization'] = 'Bearer ' + result['access_token']
+        res = self.make_request('/api/v1/fresh-login', data=dict(password='test1234'))
+        access_token = json.loads(res.data.decode())['access_token']
+        delete_res = self.client.delete(
+            '/api/v1/delete-account',
+            headers={'Content-Type': 'application/json',
+                     'Authorization': 'Bearer ' + access_token})
+        result = json.loads(delete_res.data.decode())
+        self.assertEqual(result['message'], "Account deleted successfully")
+        self.assertEqual(delete_res.status_code, 200)
