@@ -6,11 +6,13 @@ from flask import jsonify
 from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+from flask_mail import Mail
 from instance.config import app_config
 
 
 db = SQLAlchemy()
 jwt = JWTManager()
+mail = Mail()
 
 
 def create_app(config_name):
@@ -22,6 +24,7 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
     db.init_app(app)
     jwt.init_app(app)
+    mail.init_app(app)
 
     from app.auth.views import auth
     from app.models import BlacklistToken
@@ -30,6 +33,11 @@ def create_app(config_name):
     def method_not_allowed(error):
         """Error handler for wrong method to an endpoint"""
         return jsonify({'message':'Method not allowed'}), 405
+
+    @app.errorhandler(500)
+    def server_error(error):
+        """Error handler for wrong method to an endpoint"""
+        return jsonify({'message':'Database connection failed! Try Again'}), 500
 
     @jwt.token_in_blacklist_loader
     def check_if_token_in_blacklist(decrypted_token):
