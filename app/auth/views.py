@@ -1,13 +1,15 @@
 """Contains views to register, login and logout user"""
-import datetime
+import datetime, uuid
 from flask import Blueprint, request, jsonify
 from flask.views import MethodView
 from flask_jwt_extended import (
-    create_access_token, create_refresh_token,get_raw_jwt,
-    jwt_required
+    create_access_token, get_raw_jwt, jwt_required
 )
+from flask_bcrypt import Bcrypt
 from app.models import User, BlacklistToken
-from app.utils import validate_email, validate_null
+from app.utils import (
+    validate_email, validate_null, random_string, send_reset_password
+)
 
 auth = Blueprint('auth', __name__, url_prefix='/api/v1')
 
@@ -85,6 +87,42 @@ class LogoutUser(MethodView):
         return jsonify(response), 200
 
 
+class ResetPassword(MethodView):
+    """Method to reset a user password"""
+    def post(self):
+        """Endpoint to reset a user password"""
+        if not request.get_json():
+            response = {'error':'Bad Request. Request should be JSON format'}
+            return jsonify(response), 400
+        data = request.get_json()
+        email = data.get('email')
+
+        null_input = validate_null(email=email)
+        if null_input:
+            response = {'message': null_input}
+            return jsonify(response), 400
+
+        if validate_email(email):
+            user = User.query.filter_by(email=email).first()
+            if user:
+                password = random_string()
+                sent = send_reset_password(email, password)
+                if sent:
+                    user_id = user.id
+                    password = Bcrypt().generate_password_hash(password).decode()
+                    User.update(User, user_id, password=password)
+                    response = {'message':'An email has been sent with instructions for'+
+                                          ' your new password'}
+                    return jsonify(response), 201
+                response = {'message':'Password was not reset, Try again'}
+                return jsonify(response), 500
+            response = {'message': 'Email does not exists'}
+            return jsonify(response), 400
+        response = {'message': 'Please enter a valid email address'}
+        return jsonify(response), 400
+
+
 auth.add_url_rule('/register', view_func=RegisterUser.as_view('register'))
 auth.add_url_rule('/login', view_func=LoginUser.as_view('login'))
 auth.add_url_rule('/logout', view_func=LogoutUser.as_view('logout'))
+auth.add_url_rule('/reset-password', view_func=ResetPassword.as_view('reset-password'))
