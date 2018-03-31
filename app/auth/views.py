@@ -119,7 +119,7 @@ class ResetPassword(MethodView):
                 if sent:
                     user_id = user.id
                     password = Bcrypt().generate_password_hash(password).decode()
-                    User.update(User, user_id, password=password)
+                    User.update(User, user_id, password=password, update_pass=True)
                     response = {'message':'An email has been sent with instructions for'+
                                           ' your new password'}
                     return jsonify(response), 201
