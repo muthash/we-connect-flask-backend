@@ -29,6 +29,11 @@ def create_app(config_name):
     from app.auth.views import auth
     from app.models import BlacklistToken
 
+    @app.errorhandler(400)
+    def bad_request(error):
+        """Error handler for a bad request"""
+        return jsonify({'message':'The Server did not understand the request'}), 400
+
     @app.errorhandler(405)
     def method_not_allowed(error):
         """Error handler for wrong method to an endpoint"""
