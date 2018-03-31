@@ -20,11 +20,11 @@ class BaseModel(db.Model):
         db.session.commit()
 
     @staticmethod
-    def update(table_name, row_id, **kwargs):
+    def update(class_name, row_id, **kwargs):
         """Update selected columns in given row in a table"""
-        row = table_name.query.filter_by(id=row_id).first()
-        for column, value in kwargs.items():
-            setattr(row, column, value)
+        row = class_name.query.filter_by(id=row_id).first()
+        for column in kwargs:
+            setattr(row, column, kwargs[column])
         db.session.commit()
 
 
@@ -51,7 +51,7 @@ class User(BaseModel):
         self.registered_on = datetime.datetime.now()
         self.last_login = datetime.datetime.now()
         self.admin = admin
-    
+
     def password_is_valid(self, password):
         """Check the password against its hash"""
         return Bcrypt().check_password_hash(self.password, password)
