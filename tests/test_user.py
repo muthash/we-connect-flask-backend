@@ -56,11 +56,21 @@ class AuthTestCase(BaseTestCase):
     def test_password_reset(self):
         """Test password reset"""
         self.register_user()
-        reset_res = self.client.post(
-            '/api/v1/reset-password',
-            headers={'Content-Type': 'application/json'},
-            data=json.dumps(dict(email='user@test.com')))
+        reset_res = self.make_request('/api/v1/reset-password', data=dict(email='user@test.com'))
         result = json.loads(reset_res.data.decode())
-        self.assertEqual(result['message'],
-                         "An email has been sent with instructions for your new password")
+        self.assertEqual(result['message'], "An email has been sent with your new password")
         self.assertEqual(reset_res.status_code, 201)
+
+    def test_password_change(self):
+        """Test setting of new password"""
+        self.register_user()
+        reset_res = self.make_request('/api/v1/reset-password', data=dict(email='user@test.com'))
+        result = json.loads(reset_res.data.decode())
+        passwords = {'old_password': result['password'], 'new_password': 'newtestpass'}
+        login_res = self.login_user('user@test.com', result['password'])
+        result_ = json.loads(login_res.data.decode())
+        self.header['Authorization'] = 'Bearer ' + result_['access_token']
+        change_res = self.make_request('/api/v1/change-password', data=passwords, method='put')
+        result_c = json.loads(change_res.data.decode())
+        self.assertEqual(result_c['message'], "Password changed successfully")
+        self.assertEqual(change_res.status_code, 200)
