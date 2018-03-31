@@ -13,11 +13,15 @@ class BaseModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    @staticmethod
-    def delete(row_id):
+    def delete(self):
         """Deletes a given object"""
-        db.session.delete(row_id)
+        db.session.delete(self)
         db.session.commit()
+    # @staticmethod
+    # def delete(row_id):
+    #     """Deletes a given object"""
+    #     db.session.delete(row_id)
+    #     db.session.commit()
 
     @staticmethod
     def update(class_name, row_id, **kwargs):
