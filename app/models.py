@@ -39,17 +39,19 @@ class User(BaseModel):
     password = db.Column(db.String(256), nullable=False)
     registered_on = db.Column(db.DateTime, default=db.func.current_timestamp())
     last_login = db.Column(db.DateTime, default=db.func.current_timestamp())
+    update_pass = db.Column(db.Boolean, default=False)
     admin = db.Column(db.Boolean, default=False)
     business_ = db.relationship('Business', backref='owner', cascade="all, delete-orphan", lazy=True)
     user_reviews = db.relationship('Review', backref='reviewer', cascade="all, delete-orphan", lazy=True)
 
-    def __init__(self, email, username, password, admin=False):
+    def __init__(self, email, username, password, update_pass=False, admin=False):
         """Initialize the user with the user details"""
         self.email = email
         self.username = username
         self.password = Bcrypt().generate_password_hash(password).decode()
         self.registered_on = datetime.datetime.now()
         self.last_login = datetime.datetime.now()
+        self.update_pass = update_pass
         self.admin = admin
 
     def password_is_valid(self, password):
