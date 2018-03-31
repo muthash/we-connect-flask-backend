@@ -17,11 +17,6 @@ class BaseModel(db.Model):
         """Deletes a given object"""
         db.session.delete(self)
         db.session.commit()
-    # @staticmethod
-    # def delete(row_id):
-    #     """Deletes a given object"""
-    #     db.session.delete(row_id)
-    #     db.session.commit()
 
     @staticmethod
     def update(class_name, row_id, **kwargs):
