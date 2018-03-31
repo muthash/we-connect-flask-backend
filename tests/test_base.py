@@ -28,6 +28,8 @@ class BaseTestCase(unittest.TestCase):
         self.data = json.dumps(kwargs['data'])
         if method == 'put':
             return self.client.put(path=self.url, headers=self.header, data=self.data)
+        elif method == 'delete':
+            return self.client.delete(path=self.url, headers=self.header, data=self.data)
         return self.client.post(path=self.url, headers=self.header, data=self.data)
 
     def register_user(self, email="user@test.com", username="stephen",
