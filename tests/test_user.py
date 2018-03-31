@@ -52,3 +52,15 @@ class AuthTestCase(BaseTestCase):
         result = json.loads(logout_res.data.decode())
         self.assertEqual(result['message'], "Successfully logged out")
         self.assertEqual(logout_res.status_code, 200)
+
+    def test_password_reset(self):
+        """Test password reset"""
+        self.register_user()
+        reset_res = self.client.post(
+            '/api/v1/reset-password',
+            headers={'Content-Type': 'application/json'},
+            data=json.dumps(dict(email='user@test.com')))
+        result = json.loads(reset_res.data.decode())
+        self.assertEqual(result['message'],
+                         "An email has been sent with instructions for your new password")
+        self.assertEqual(reset_res.status_code, 201)
