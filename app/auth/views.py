@@ -166,20 +166,30 @@ class ChangePassword(MethodView):
 
 class DeleteAccount(MethodView):
     """Method to used to delete a user's account"""
-    @fresh_jwt_required
+    @jwt_required
     def delete(self):
         """Endpoint to change a user password"""
+        if request.get_json(silent=True) is None:
+            response = {'error':'Bad Request. Request should be JSON format'}
+            return jsonify(response), 400
+        data = request.get_json()
+        password = data.get('password')
         user_id = get_jwt_identity()
         jti = get_raw_jwt()['jti']
 
+        null_input = validate_null(password=password)
+        if null_input:
+            response = {'message': null_input}
+            return jsonify(response), 400
+
         user = User.query.filter_by(id=user_id).first()
-        if user:
+        if user and user.password_is_valid(password):
             user.delete()
             blacklist = BlacklistToken(token=jti)
             blacklist.save()
             response = {'message':'Account deleted successfully'}
             return jsonify(response), 200
-        response = {'message':'Account does not exist.'}
+        response = {'message':'Invalid password'}
         return jsonify(response), 401
 
 
