@@ -32,15 +32,24 @@ class BaseView(MethodView):
             response = {'message': user_data}
             return jsonify(response), 400
         return False
-    
+
     @staticmethod
     def invalid_email(email):
+        """Returns false if email is valid"""
         if not validate_email(email):
-            """Returns false if email is valid"""
             response = {'message': 'Please enter a valid email address'}
             return jsonify(response), 400
         return False
-        
+
+    @staticmethod
+    def generate_token(message, user, expires=datetime.timedelta(hours=1)):
+        """Return access token and response to user"""
+        response = {
+            'message': message,
+            'access_token': create_access_token(identity=user, fresh=False, expires_delta=expires)
+        }
+        return jsonify(response), 200
+
 
 class RegisterUser(BaseView):
     """Method to Register a new user"""
@@ -55,7 +64,7 @@ class RegisterUser(BaseView):
             user_data = validate_null(email=email, username=username, password=password)
             if not self.null_input(user_data):
                 if not self.invalid_email(email):
-                    user = user = User.query.filter_by(email=email).first()
+                    user = User.query.filter_by(email=email).first()
                     if not user:
                         user = User(email=email, username=username, password=password)
                         user.save()
@@ -68,43 +77,34 @@ class RegisterUser(BaseView):
         return self.invalid_json()
 
 
-class LoginUser(MethodView):
+class LoginUser(BaseView):
     """Method to login a user"""
     def post(self):
         """Endpoint to login a user"""
-        if request.get_json(silent=True) is None:
-            response = {'error':'Bad Request. Request should be JSON format'}
-            return jsonify(response), 400
-        data = request.get_json()
-        email = data.get('email')
-        password = data.get('password')
+        if not self.invalid_json():
+            data = request.get_json()
+            email = data.get('email')
+            password = data.get('password')
 
-        null_input = validate_null(email=email, password=password)
-        if null_input:
-            response = {'message': null_input}
-            return jsonify(response), 400
-
-        if validate_email(email):
-            user = User.query.filter_by(email=email).first()
-            if user and user.password_is_valid(password):
-                if not user.update_pass:
-                    expires = datetime.timedelta(hours=1)
-                    response = {
-                        'message': 'Login successfull',
-                        'access_token': create_access_token(identity=user.id, fresh=False, expires_delta=expires)
-                    }
-                    return jsonify(response), 200
-                else:
-                    expires = datetime.timedelta(minutes=5)
-                    response = {
-                        'message': 'Change your password inorder to continue',
-                        'access_token': create_access_token(identity=user.id, fresh=True, expires_delta=expires)
-                    }
-                    return jsonify(response), 200
-            response = {'message':'Invalid email or password, Please try again'}
-            return jsonify(response), 401
-        response = {'message': 'Please enter a valid email address'}
-        return jsonify(response), 400
+            user_data = validate_null(email=email, password=password)
+            if not self.null_input(user_data):
+                if not self.invalid_email(email):
+                    user = User.query.filter_by(email=email).first()
+                    if user and user.password_is_valid(password):
+                        if not user.update_pass:
+                            message = 'Login successfull'
+                            user = user.id
+                            return self.generate_token(message, user)
+                        else:
+                            message = 'Login successfull'
+                            user = user.id
+                            expires = datetime.timedelta(minutes=5)
+                            return self.generate_token(message, user, expires=expires)
+                    response = {'message':'Invalid email or password, Please try again'}
+                    return jsonify(response), 401
+                return self.invalid_email(email)
+            return self.null_input(user_data)
+        return self.invalid_json()
 
 
 class LogoutUser(MethodView):
