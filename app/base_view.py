@@ -18,7 +18,7 @@ class BaseView(MethodView):
         """Returns false if request is json"""
         if request.get_json(silent=True) is None:
             response = {'message':'Bad Request. Request should be JSON format'}
-            return jsonify(response), 400
+            return jsonify(response), 405
         return False
 
     @staticmethod
