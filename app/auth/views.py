@@ -119,39 +119,36 @@ class LogoutUser(MethodView):
         return jsonify(response), 200
 
 
-class ResetPassword(MethodView):
+class ResetPassword(BaseView):
     """Method to reset a user password"""
     def post(self):
         """Endpoint to reset a user password"""
-        if request.get_json(silent=True) is None:
-            response = {'error':'Bad Request. Request should be JSON format'}
-            return jsonify(response), 400
-        data = request.get_json()
-        email = data.get('email')
+        if not self.invalid_json():
+            data = request.get_json()
+            email = data.get('email')
 
-        null_input = validate_null(email=email)
-        if null_input:
-            response = {'message': null_input}
-            return jsonify(response), 400
-
-        if validate_email(email):
-            user = User.query.filter_by(email=email).first()
-            if user:
-                password = random_string()
-                sent = send_reset_password(email, password)
-                if sent:
-                    user_id = user.id
-                    password_ = Bcrypt().generate_password_hash(password).decode()
-                    User.update(User, user_id, password=password_, update_pass=True)
-                    response = {'password': password,
-                                'message':'An email has been sent with your new password'}
-                    return jsonify(response), 201
-                response = {'message':'Password was not reset, Try again'}
-                return jsonify(response), 500
-            response = {'message': 'Email does not exists'}
-            return jsonify(response), 400
-        response = {'message': 'Please enter a valid email address'}
-        return jsonify(response), 400
+            user_data = validate_null(email=email)
+            if not self.null_input(user_data):
+                if not self.invalid_email(email):
+                    user = User.query.filter_by(email=email).first()
+                    if user:
+                        password = random_string()
+                        sent = send_reset_password(email, password)
+                        if sent:
+                            user_id = user.id
+                            password_ = Bcrypt().generate_password_hash(password).decode()
+                            User.update(User, user_id, password=password_, update_pass=True)
+                            response = {'password': password,
+                                        'message':'An email has been sent with your new password'}
+                            return jsonify(response), 201
+                        response = {'message':'Password was not reset, Try again'}
+                        return jsonify(response), 500
+                    response = {'message': 'Email does not exists'}
+                    return jsonify(response), 400
+                return self.invalid_email(email)
+            return self.null_input(user_data)
+        return self.invalid_json()
+               
 
 
 class ChangePassword(MethodView):
