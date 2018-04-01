@@ -26,6 +26,7 @@ def create_app(config_name):
     jwt.init_app(app)
     mail.init_app(app)
 
+    
     from app.auth.views import auth
     from app.models import BlacklistToken
 
@@ -48,8 +49,10 @@ def create_app(config_name):
     def check_if_token_in_blacklist(decrypted_token):
         """Check if token is blacklisted"""
         jti = decrypted_token['jti']
-        blacklist = BlacklistToken.query.all()
-        return jti in blacklist
+        blacklist = BlacklistToken.query.filter_by(token=jti).first()
+        if blacklist is None:
+            return False
+        return blacklist.revoked
 
     app.register_blueprint(auth)
 
