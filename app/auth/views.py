@@ -15,34 +15,57 @@ from app.utils import (
 auth = Blueprint('auth', __name__, url_prefix='/api/v1')
 
 
-class RegisterUser(MethodView):
-    """Method to Register a new user"""
-    def post(self):
-        """Endpoint to save the data to the database"""
+class BaseView(MethodView):
+    """Base view method"""
+    @staticmethod
+    def invalid_json():
+        """Returns false if request is json"""
         if request.get_json(silent=True) is None:
             response = {'message':'Bad Request. Request should be JSON format'}
             return jsonify(response), 400
-        data = request.get_json()
-        email = data.get('email')
-        username = data.get('username')
-        password = data.get('password')
+        return False
 
-        null_input = validate_null(email=email, username=username, password=password)
-        if null_input:
-            response = {'message': null_input}
+    @staticmethod
+    def null_input(user_data):
+        """Returns false if user input contains data"""
+        if user_data:
+            response = {'message': user_data}
             return jsonify(response), 400
+        return False
+    
+    @staticmethod
+    def invalid_email(email):
+        if not validate_email(email):
+            """Returns false if email is valid"""
+            response = {'message': 'Please enter a valid email address'}
+            return jsonify(response), 400
+        return False
+        
 
-        if validate_email(email):
-            user = user = User.query.filter_by(email=email).first()
-            if not user:
-                user = User(email=email, username=username, password=password)
-                user.save()
-                response = {'message': 'Account created successfully'}
-                return jsonify(response), 201
-            response = {'message': 'User already exists'}
-            return jsonify(response), 409
-        response = {'message': 'Please enter a valid email address'}
-        return jsonify(response), 400
+class RegisterUser(BaseView):
+    """Method to Register a new user"""
+    def post(self):
+        """Endpoint to save the data to the database"""
+        if not self.invalid_json():
+            data = request.get_json()
+            email = data.get('email')
+            username = data.get('username')
+            password = data.get('password')
+
+            user_data = validate_null(email=email, username=username, password=password)
+            if not self.null_input(user_data):
+                if not self.invalid_email(email):
+                    user = user = User.query.filter_by(email=email).first()
+                    if not user:
+                        user = User(email=email, username=username, password=password)
+                        user.save()
+                        response = {'message': 'Account created successfully'}
+                        return jsonify(response), 201
+                    response = {'message': 'User already exists'}
+                    return jsonify(response), 409
+                return self.invalid_email(email)
+            return self.null_input(user_data)
+        return self.invalid_json()
 
 
 class LoginUser(MethodView):
