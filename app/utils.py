@@ -7,12 +7,10 @@ from app import mail
 
 def validate_email(email):
     """Returns true if email is valid email format else false"""
-    if len(email) > 4:
-        regex = r"(^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$)"
-        if re.match(regex, email) is None:
-            return False
-        return True
-    return False
+    regex = r"(^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$)"
+    if len(email) < 5 or re.match(regex, email) is None:
+        return False
+    return True
 
 def validate_null(**kwargs):
     """Returns a list with invalid field messages"""
