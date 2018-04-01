@@ -1,5 +1,7 @@
 """Test case for the user"""
 import json
+from unittest.mock import patch, Mock
+from smtplib import SMTPException
 from tests.test_base import BaseTestCase
 
 
@@ -83,7 +85,7 @@ from tests.test_base import BaseTestCase
 #         self.assertEqual(res.status_code, 405)
 #         result = json.loads(res.data.decode())
 #         self.assertEqual(result['message'], 'Bad Request. Request should be JSON format')
-    
+
 #     def test_login_missing_field(self):
 #         """Test use registration with missing password field"""
 #         user_data = {'email': "test@test.com"}
@@ -92,39 +94,56 @@ from tests.test_base import BaseTestCase
 #         result = json.loads(res.data.decode())
 #         self.assertEqual(result['message'], ['Please enter your password'])
 
-class TestLogoutUser(BaseTestCase):
-    """Test for Logout User endpoint"""
-    def test_logout_user(self):
-        """Test if logged in user can logout"""
-        self.get_login_token()
-        logout_res = self.client.post('/api/v1/logout', headers=self.header)
-        result = json.loads(logout_res.data.decode())
-        self.assertEqual(result['message'], "Successfully logged out")
-        self.assertEqual(logout_res.status_code, 200)
+# class TestLogoutUser(BaseTestCase):
+#     """Test for Logout User endpoint"""
+#     def test_logout_user(self):
+#         """Test if logged in user can logout"""
+#         self.get_login_token()
+#         logout_res = self.client.post('/api/v1/logout', headers=self.header)
+#         result = json.loads(logout_res.data.decode())
+#         self.assertEqual(result['message'], "Successfully logged out")
+#         self.assertEqual(logout_res.status_code, 200)
 
-    def test_already_logout_user(self):
-        """Test logout for aleady logged out user"""
-        self.get_login_token()
-        self.client.post('/api/v1/logout', headers=self.header)
-        logout_res = self.client.post('/api/v1/logout', headers=self.header)
-        result = json.loads(logout_res.data.decode())
-        self.assertEqual(result['msg'], "Token has been revoked")
-        self.assertEqual(logout_res.status_code, 401)
+#     def test_already_logout_user(self):
+#         """Test logout for aleady logged out user"""
+#         self.get_login_token()
+#         self.client.post('/api/v1/logout', headers=self.header)
+#         logout_res = self.client.post('/api/v1/logout', headers=self.header)
+#         result = json.loads(logout_res.data.decode())
+#         self.assertEqual(result['msg'], "Token has been revoked")
+#         self.assertEqual(logout_res.status_code, 401)
 
-# class AuthTestCase(BaseTestCase):
-#     """Test case for the user"""
+class TestResetPassword(BaseTestCase):
+    """Test reset password user endpoint"""
+    def test_password_reset(self):
+        """Test password reset"""
+        self.register_user()
+        reset_res = self.make_request('/api/v1/reset-password', data=dict(email='user@test.com'))
+        result = json.loads(reset_res.data.decode())
+        self.assertEqual(result['message'], "An email has been sent with your new password")
+        self.assertEqual(reset_res.status_code, 201)
 
-#     
+    def test_json_request(self):
+        """Test reset password request for valid json"""
+        res = self.client.post('/api/v1/reset-password', data=dict(email='user@test.com'))
+        self.assertEqual(res.status_code, 405)
+        result = json.loads(res.data.decode())
+        self.assertEqual(result['message'], 'Bad Request. Request should be JSON format')
 
-#     
+    def test_reset_non_existing_email(self):
+        """Test reset password with a non existing account"""
+        reset_res = self.make_request('/api/v1/reset-password', data=dict(email='none@test.com'))
+        result = json.loads(reset_res.data.decode())
+        self.assertEqual(result['message'], "Please enter a valid email address")
+        self.assertEqual(reset_res.status_code, 401)
 
-#     def test_password_reset(self):
-#         """Test password reset"""
-#         self.register_user()
-#         reset_res = self.make_request('/api/v1/reset-password', data=dict(email='user@test.com'))
-#         result = json.loads(reset_res.data.decode())
-#         self.assertEqual(result['message'], "An email has been sent with your new password")
-#         self.assertEqual(reset_res.status_code, 201)
+    def test_reset_invalid_email(self):
+        """Test reset password with an invalid email address"""
+        reset_res = self.make_request('/api/v1/reset-password', data=dict(email='usertest'))
+        result = json.loads(reset_res.data.decode())
+        self.assertEqual(result['message'], "Please enter a valid email address")
+        self.assertEqual(reset_res.status_code, 400)
+
 
 #     def test_password_change(self):
 #         """Test password change"""
