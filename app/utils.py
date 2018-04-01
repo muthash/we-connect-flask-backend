@@ -1,4 +1,6 @@
 import re, uuid
+
+from smtplib import SMTPException
 from flask_mail import Message
 from app import mail
 
@@ -34,11 +36,23 @@ def random_string(string_length=8):
 
 def send_reset_password(email, password):
     """Returns a random string of length string_length"""
-    message = Message(
-        subject='Password Reset',
-        recipients=[email],
-        body='Your new password is: {}'.format(password),
-        html='<a href="https://github.com/muthash" target="_blank">Click link to reset password</a>'
-    )
-    mail.send(message)
-    return True
+    try:
+        message = Message(
+            subject='Password Reset',
+            recipients=[email],
+            body='Your new password is: {}'.format(password),
+            html='<a href="https://github.com/muthash" target="_blank">Click link to reset password</a>'
+        )
+        mail.send(message)
+        return True
+    except SMTPException:
+        return False
+
+messages = {
+    'account_created': 'Account created successfully',
+    'exists': 'User already exists',
+    'valid_email': 'Please enter a valid email address',
+    'login': 'Login successfull',
+    'valid_epass': 'Invalid email or password',
+    'not_reset': 'Password was not reset. Try again'
+}
