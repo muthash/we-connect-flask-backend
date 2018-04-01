@@ -44,6 +44,14 @@ class BaseTestCase(unittest.TestCase):
         user_data = {'email': email, 'password': password}
         return self.make_request('/api/v1/login', data=user_data)
 
+    def get_login_token(self):
+        """This helper gets the access token"""
+        self.register_user()
+        login_res = self.login_user()
+        result_ = json.loads(login_res.data.decode())
+        self.header['Authorization'] = 'Bearer ' + result_['access_token']
+        return self.header
+
     def tearDown(self):
         """teardown all initialized variables"""
         with self.app.app_context():
