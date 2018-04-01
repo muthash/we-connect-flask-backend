@@ -20,7 +20,6 @@ class Config(object):
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_BLACKLIST_ENABLED = True
-    JWT_BLACKLIST_TOKEN_CHECKS = 'access'
     MAIL_DEFAULT_SENDER = os.environ.get('EMAIL')
     MAIL_PASSWORD = os.environ.get('PASSWORD')
     MAIL_SERVER = 'smtp.gmail.com'
