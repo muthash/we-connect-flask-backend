@@ -9,7 +9,8 @@ from flask_jwt_extended import (
 from flask_bcrypt import Bcrypt
 from app.models import User, BlacklistToken
 from app.utils import (
-    validate_email, validate_null, random_string, send_reset_password
+    validate_email, validate_null, random_string, send_reset_password,
+    messages
 )
 
 auth = Blueprint('auth', __name__, url_prefix='/api/v1')
@@ -17,6 +18,13 @@ auth = Blueprint('auth', __name__, url_prefix='/api/v1')
 
 class BaseView(MethodView):
     """Base view method"""
+   
+    def invalid_email(self, email):
+        """Returns false if email is valid"""
+        if not validate_email(email):
+            return self.generate_response(messages['valid_email'], 400)
+        return False
+
     @staticmethod
     def invalid_json():
         """Returns false if request is json"""
@@ -34,14 +42,6 @@ class BaseView(MethodView):
         return False
 
     @staticmethod
-    def invalid_email(email):
-        """Returns false if email is valid"""
-        if not validate_email(email):
-            response = {'message': 'Please enter a valid email address'}
-            return jsonify(response), 400
-        return False
-
-    @staticmethod
     def generate_token(message, user, expires=datetime.timedelta(hours=1)):
         """Return access token and response to user"""
         response = {
@@ -49,6 +49,12 @@ class BaseView(MethodView):
             'access_token': create_access_token(identity=user, fresh=False, expires_delta=expires)
         }
         return jsonify(response), 200
+
+    @staticmethod
+    def generate_response(message, status):
+        """Return application/json object"""
+        response = {'message': message}
+        return jsonify(response), status
 
 
 class RegisterUser(BaseView):
@@ -68,10 +74,8 @@ class RegisterUser(BaseView):
                     if not user:
                         user = User(email=email, username=username, password=password)
                         user.save()
-                        response = {'message': 'Account created successfully'}
-                        return jsonify(response), 201
-                    response = {'message': 'User already exists'}
-                    return jsonify(response), 409
+                        return self.generate_response(messages['account_created'], 201)
+                    return self.generate_response(messages['exists'], 409)
                 return self.invalid_email(email)
             return self.null_input(user_data)
         return self.invalid_json()
@@ -92,16 +96,11 @@ class LoginUser(BaseView):
                     user = User.query.filter_by(email=email).first()
                     if user and user.password_is_valid(password):
                         if not user.update_pass:
-                            message = 'Login successfull'
-                            user = user.id
-                            return self.generate_token(message, user)
+                            return self.generate_token(messages['login'], user.id)
                         else:
-                            message = 'Login successfull'
-                            user = user.id
                             expires = datetime.timedelta(minutes=5)
-                            return self.generate_token(message, user, expires=expires)
-                    response = {'message':'Invalid email or password, Please try again'}
-                    return jsonify(response), 401
+                            return self.generate_token(messages['login'], user.id, expires=expires)
+                    return self.generate_response(messages['valid_epass'], 401)
                 return self.invalid_email(email)
             return self.null_input(user_data)
         return self.invalid_json()
