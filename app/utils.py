@@ -54,5 +54,10 @@ messages = {
     'valid_email': 'Please enter a valid email address',
     'login': 'Login successfull',
     'valid_epass': 'Invalid email or password',
-    'not_reset': 'Password was not reset. Try again'
+    'sent_mail': 'An email has been sent with your new password',
+    'not_reset': 'Password was not reset. Try again',
+    'password': 'Password changed successfully',
+    'valid_pass': 'Invalid password',
+    'valid_login': 'Please login to continue',
+    'delete':'Account deleted successfully'
 }
