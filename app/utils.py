@@ -59,8 +59,9 @@ messages = {
     'password': 'Password changed successfully',
     'valid_pass': 'Invalid password',
     'valid_login': 'Please login to continue',
-    'delete':'Account deleted successfully',
+    'delete': 'Account deleted successfully',
     'business_created': 'Business created successfully',
     'business_updated': 'Business updated successfully',
-    'forbidden': 'The operation is Forbidden'
+    'forbidden': 'The operation is Forbidden',
+    'business_delete':'Business deleted successfully',
 }
