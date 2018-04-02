@@ -33,12 +33,13 @@ class TestPostBusiness(BaseTestCase):
 
     def test_missing_user(self):
         """Test business for unregistered user"""
-        business_data = {'name':'KTDA', 'description':'This is good', 'category':'Farming', 'location':'Narok'}
-        access_token = create_access_token(identity=2, expires_delta=datetime.timedelta(hours=1))
-        self.header['Authorization'] = 'Bearer ' + access_token
-        res = self.make_request('/api/v1/business', data=business_data)
-        result = json.loads(res.data.decode())
-        self.assertEqual(result['message'], "Please login to continue")
+        with self.app.app_context():
+            business_data = {'name':'KTDA', 'description':'This is good', 'category':'Farming', 'location':'Narok'}
+            access_token = create_access_token(identity=2, expires_delta=datetime.timedelta(hours=1))
+            self.header['Authorization'] = 'Bearer ' + access_token
+            res = self.make_request('/api/v1/business', data=business_data)
+            result = json.loads(res.data.decode())
+            self.assertEqual(result['message'], "Please login to continue")
 
 
 class TestPutBusiness(BaseTestCase):
