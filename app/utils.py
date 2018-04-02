@@ -34,17 +34,13 @@ def random_string(string_length=8):
 
 def send_reset_password(email, password):
     """Returns a random string of length string_length"""
-    try:
-        message = Message(
-            subject='Password Reset',
-            recipients=[email],
-            body='Your new password is: {}'.format(password),
-            html='<a href="https://github.com/muthash" target="_blank">Click link to reset password</a>'
-        )
-        mail.send(message)
-        return True
-    except SMTPException:
-        return False
+    message = Message(
+        subject='Password Reset',
+        recipients=[email],
+        body='Your new password is: {}'.format(password),
+        html='<a href="https://github.com/muthash" target="_blank">Click link to reset password</a>'
+    )
+    mail.send(message)
 
 def remove_more_spaces(user_input):
     """Maximum number os spaces between words should be one"""
@@ -64,5 +60,5 @@ messages = {
     'valid_pass': 'Invalid password',
     'valid_login': 'Please login to continue',
     'delete':'Account deleted successfully',
-    'business_created': 'business created successfully'
+    'business_created': 'Business created successfully'
 }
