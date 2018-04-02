@@ -106,8 +106,16 @@ class BusinessManipulation(BaseView):
             return self.generate_response(messages['no_business'], 404)
         else:
             business = Business.query.filter_by(id=business_id).first()
-            response = {'message':'Business is not'} 
-            return jsonify(response), 403
+            if business:
+                reviews = [business.reviews.serialize() for review in business.reviews]
+                response = {
+                    'message': 'Business found',
+                    'business': business.serialize(),
+                    'number_of_reviews': len(business.reviews),
+                    'reviews': reviews
+                }
+                return jsonify(response), 200
+            return self.generate_response(messages['not_found'], 404)
 
 
 business_view = BusinessManipulation.as_view('businesses')
