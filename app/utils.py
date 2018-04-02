@@ -63,5 +63,7 @@ messages = {
     'business_created': 'Business created successfully',
     'business_updated': 'Business updated successfully',
     'forbidden': 'The operation is Forbidden',
-    'business_delete':'Business deleted successfully',
+    'business_delete': 'Business deleted successfully',
+    'businesses': 'The following business are available',
+    'no_business': 'There are no businesses registered currently'
 }
