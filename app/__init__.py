@@ -28,6 +28,7 @@ def create_app(config_name):
 
     
     from app.auth.views import auth
+    from app.business.views import business
     from app.models import BlacklistToken
 
     @app.errorhandler(400)
@@ -55,5 +56,6 @@ def create_app(config_name):
         return blacklist.revoked
 
     app.register_blueprint(auth)
+    app.register_blueprint(business)
 
     return app
