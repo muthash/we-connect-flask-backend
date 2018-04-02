@@ -65,5 +65,6 @@ messages = {
     'forbidden': 'The operation is Forbidden',
     'business_delete': 'Business deleted successfully',
     'businesses': 'The following business are available',
-    'no_business': 'There are no businesses registered currently'
+    'no_business': 'There are no businesses registered currently',
+    'not_found': 'Resource not found'
 }
