@@ -64,6 +64,27 @@ class BusinessManipulation(BaseView):
             return self.null_input(business_data)
         return self.invalid_json()
 
+    @jwt_required
+    def delete(self, business_id):
+        """delete a single business"""
+        if not self.invalid_json():
+            data = request.get_json()
+            password = data.get('password')
+            user_id = get_jwt_identity()
+
+            user_data = validate_null(password=password)
+            if not self.null_input(user_data):
+                user = User.query.filter_by(id=user_id).first()
+                if user and user.password_is_valid(password):
+                    business = Business.query.filter_by(id=business_id, user_id=user_id).first()
+                    if business:
+                        business.delete()
+                        return self.generate_response(messages['business_delete'], 200)
+                    return self.generate_response(messages['forbidden'], 403)
+                return self.generate_response(messages['valid_pass'], 401)
+            return self.null_input(user_data)
+        return self.invalid_json()
+
 
     # def get(self, business_id):
     #     """return a list of all businesses else a single business"""
