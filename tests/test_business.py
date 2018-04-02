@@ -143,7 +143,15 @@ class TestGetBusiness(BaseTestCase):
         self.assertEqual(result['message'], "There are no businesses registered currently")
 
     def test_get_business_by_id(self):
-        """Test get empty business in database"""
-        res = self.client.get('/api/v1/business')
+        """Test get business by id"""
+        self.register_business()
+        res = self.client.get('/api/v1/business/1')
         result = json.loads(res.data.decode())
-        self.assertEqual(result['message'], "There are no businesses registered currently")
+        self.assertEqual(result['message'], "Business found")
+
+    def test_get_business_not_available(self):
+        """Test get not available business by id"""
+        res = self.client.get('/api/v1/business/1')
+        result = json.loads(res.data.decode())
+        self.assertEqual(result['message'], "Resource not found")
+
