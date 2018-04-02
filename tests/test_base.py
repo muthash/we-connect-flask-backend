@@ -52,6 +52,15 @@ class BaseTestCase(unittest.TestCase):
         self.header['Authorization'] = 'Bearer ' + result_['access_token']
         return self.header
 
+    def register_business(self, name="KTDA", description="This is my business",
+                          category="Farming", location="Narok"):
+        """This helper method helps register a test business"""
+        business_data = {'name':name, 'description':description, 'categoty':category, 'location':location}
+        self.get_login_token()
+        res = self.make_request('/api/v1/business', data=business_data)
+        result = json.loads(res.data.decode())
+        return result
+
     def tearDown(self):
         """teardown all initialized variables"""
         with self.app.app_context():
