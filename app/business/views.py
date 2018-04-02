@@ -1,13 +1,8 @@
 """Contains views to register, login reset password and logout user"""
 from flask import Blueprint, request, jsonify
-from flask.views import MethodView
-from flask_jwt_extended import get_raw_jwt, jwt_required, get_jwt_identity, jwt_optional
-from flask_bcrypt import Bcrypt
+from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
 from app.models import User,  Business
-from app.utils import (
-    validate_null, random_string, send_reset_password, messages,
-    remove_more_spaces
-)
+from app.utils import validate_null, messages, remove_more_spaces
 from app.base_view import BaseView
 
 biz = Blueprint('biz', __name__, url_prefix='/api/v1/business')
@@ -122,8 +117,3 @@ business_view = BusinessManipulation.as_view('businesses')
 biz.add_url_rule('', defaults={'business_id':None}, view_func=business_view, methods=['GET',])
 biz.add_url_rule('', view_func=business_view, methods=['POST',])
 biz.add_url_rule('/<int:business_id>', view_func=business_view, methods=['GET', 'PUT', 'DELETE'])
-
-
-# biz.add_url_rule('', view_func=BusinessManipulation.as_view('businesses'))
-# biz.add_url_rule('/<int:category>/<int:location>', view_func=BusinessManipulation.as_view('filter-businesses'))
-# biz.add_url_rule('/<int:business_id>/<int:my>', view_func=business_view, methods=['GET', 'PUT', 'DELETE'])
