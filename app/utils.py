@@ -46,6 +46,12 @@ def send_reset_password(email, password):
     except SMTPException:
         return False
 
+def remove_more_spaces(user_input):
+    """Maximum number os spaces between words should be one"""
+    strip_text = user_input.strip()
+    return re.sub(r'\s+', ' ', strip_text)
+
+
 messages = {
     'account_created': 'Account created successfully',
     'exists': 'User already exists',
@@ -57,5 +63,6 @@ messages = {
     'password': 'Password changed successfully',
     'valid_pass': 'Invalid password',
     'valid_login': 'Please login to continue',
-    'delete':'Account deleted successfully'
+    'delete':'Account deleted successfully',
+    'business_created': 'business created successfully'
 }
