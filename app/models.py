@@ -115,13 +115,19 @@ class Review(BaseModel):
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    def __init__(self, name, description, category, location, user_id):
+    def __init__(self, description, rating, business_id, user_id):
         """Initialize the user with the user details"""
-        self.name = name
         self.description = description
-        self.category = category
-        self.location = location
+        self.rating = rating
+        self.business_id = business_id
         self.user_id = user_id
+
+    def serialize(self):
+        """Return a dictionary"""
+        return {
+            'review': self.description,
+            'rating': self.rating
+        }
 
     def __repr__(self):
         return 'review: {}'.format(self.description)
