@@ -1,7 +1,7 @@
 """Contains views to register, login reset password and logout user"""
 from flask import Blueprint, request, jsonify
 from flask.views import MethodView
-from flask_jwt_extended import get_raw_jwt, jwt_required, get_jwt_identity
+from flask_jwt_extended import get_raw_jwt, jwt_required, get_jwt_identity, jwt_optional
 from flask_bcrypt import Bcrypt
 from app.models import User,  Business
 from app.utils import (
@@ -11,6 +11,7 @@ from app.utils import (
 from app.base_view import BaseView
 
 biz = Blueprint('biz', __name__, url_prefix='/api/v1/business')
+POSTS_PER_PAGE = 1
 
 
 class BusinessManipulation(BaseView):
@@ -85,23 +86,28 @@ class BusinessManipulation(BaseView):
             return self.null_input(user_data)
         return self.invalid_json()
 
-
-    # def get(self, business_id):
-    #     """return a list of all businesses else a single business"""
-    #     if business_id is None:
-    #         all_busines = Business.query.filter().all()
-    #         print(all_busines)
-    #         response = {'message':'Business is None'}
-    #         return jsonify(response), 201
-    #     else:
-    #         response = {'message':'Business is not'} 
-    #         return jsonify(response), 403
-    
-    # def delete(self, business_id):
-    #     """delete a single business"""
-    #     response = {'message':'Business is None'}
-    #     return jsonify(response), 409
-        
+    @jwt_optional
+    def get(self, business_id):
+        """return a list of all businesses else a single business"""
+        if business_id is None:
+            page = request.args.get('page', 1, type=int)
+            page_items = Business.query.paginate(page, POSTS_PER_PAGE, False)
+            page_items_list = [Business.serialize() for Business in page_items.items]
+            if page_items_list:
+                next_url = page_items.next_num  if page_items.has_next else None
+                prev_url = page_items.prev_num  if page_items.has_prev else None
+                response = {
+                    'message': messages['businesses'],
+                    'businesses': page_items_list,
+                    'next_page': next_url,
+                    'prev_page': prev_url
+                }
+                return jsonify(response), 200
+            return self.generate_response(messages['no_business'], 404)
+        else:
+            business = Business.query.filter_by(id=business_id).first()
+            response = {'message':'Business is not'} 
+            return jsonify(response), 403
 
 
 business_view = BusinessManipulation.as_view('businesses')
