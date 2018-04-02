@@ -78,13 +78,11 @@ class ResetPassword(BaseView):
                 user = User.query.filter_by(email=email).first()
                 if user:
                     password = random_string()
-                    sent = send_reset_password(email, password)
-                    if sent:
-                        user_id = user.id
-                        password_ = Bcrypt().generate_password_hash(password).decode()
-                        User.update(User, user_id, password=password_, update_pass=True)
-                        return self.generate_response(messages['sent_mail'], 201)
-                    return self.generate_response(messages['not_reset'], 500)
+                    send_reset_password(email, password)
+                    user_id = user.id
+                    password_ = Bcrypt().generate_password_hash(password).decode()
+                    User.update(User, user_id, password=password_, update_pass=True)
+                    return self.generate_response(messages['sent_mail'], 201)
                 return self.generate_response(messages['valid_email'], 401)
             return self.invalid_null_input(user_data, email)
         return self.invalid_json()
