@@ -1,7 +1,7 @@
 """Test case for the user"""
 import json
-from unittest.mock import patch, Mock
-from smtplib import SMTPException
+import datetime
+from flask_jwt_extended import create_access_token
 from tests.test_base import BaseTestCase
 
 
@@ -189,6 +189,15 @@ class TestChangetPassword(BaseTestCase):
         result = json.loads(change_res.data.decode())
         self.assertEqual(result['message'], ['Please enter your new_password'])
         self.assertEqual(change_res.status_code, 400)
+    
+    def test_missing_user(self):
+        """Test password change for unregistered user"""
+        passwords = {'old_password': "test1234", 'new_password': "newtestpass"}
+        access_token = create_access_token(identity=2, expires_delta=datetime.timedelta(hours=1))
+        self.header['Authorization'] = 'Bearer ' + access_token
+        res = self.make_request('/api/v1/change-password', data=passwords, method='put')
+        result = json.loads(res.data.decode())
+        self.assertEqual(result['message'], "Please login to continue")
 
 
 class TestDeleteAccount(BaseTestCase):
