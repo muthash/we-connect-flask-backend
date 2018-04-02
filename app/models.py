@@ -85,6 +85,16 @@ class Business(BaseModel):
         self.category = category
         self.location = location
         self.user_id = user_id
+    
+    def serialize(self):
+        """Return a dictionary"""
+        return {
+            'business_name': self.name,
+            'description': self.description,
+            'category': self.category,
+            'location': self.location
+        }
+
 
     def __repr__(self):
         return 'business: {}'.format(self.name)
