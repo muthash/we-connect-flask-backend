@@ -28,6 +28,7 @@ class Config(object):
 class DevelopmentConfig(Config):
     """Configurations for Development"""
     DEBUG = True
+    MAIL_SUPPRESS_SEND = True
 
 
 class TestingConfig(Config):
@@ -45,7 +46,7 @@ class StagingConfig(Config):
 class ProductionConfig(Config):
     """Configurations for production"""
     DEBUG = False
-    Testing = False
+    TESTING = False
 
 
 app_config = {
