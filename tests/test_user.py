@@ -192,12 +192,13 @@ class TestChangetPassword(BaseTestCase):
     
     def test_missing_user(self):
         """Test password change for unregistered user"""
-        passwords = {'old_password': "test1234", 'new_password': "newtestpass"}
-        access_token = create_access_token(identity=2, expires_delta=datetime.timedelta(hours=1))
-        self.header['Authorization'] = 'Bearer ' + access_token
-        res = self.make_request('/api/v1/change-password', data=passwords, method='put')
-        result = json.loads(res.data.decode())
-        self.assertEqual(result['message'], "Please login to continue")
+        with self.app.app_context():
+            passwords = {'old_password': "test1234", 'new_password': "newtestpass"}
+            access_token = create_access_token(identity=2, expires_delta=datetime.timedelta(hours=1))
+            self.header['Authorization'] = 'Bearer ' + access_token
+            res = self.make_request('/api/v1/change-password', data=passwords, method='put')
+            result = json.loads(res.data.decode())
+            self.assertEqual(result['message'], "Please login to continue")
 
 
 class TestDeleteAccount(BaseTestCase):
