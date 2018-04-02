@@ -41,6 +41,54 @@ class BusinessManipulation(BaseView):
                 return self.generate_response(messages['valid_login'], 403)
             return self.null_input(business_data)
         return self.invalid_json()
+    
+    @jwt_required
+    def put(self, business_id):
+        """update a single business"""
+        if not self.invalid_json():
+            data = request.get_json()
+            name = data.get('name')
+            description = data.get('description')
+            category = data.get('category')
+            location = data.get('location')
+            user_id = get_jwt_identity()
+
+            data_ = dict(name=name, description=description, category=category, location=location)
+            business_data = validate_null(**data_)
+            if not self.null_input(business_data):
+                business = Business.query.filter_by(id=business_id, user_id=user_id).first()
+                if business:
+                    Business.update(Business, business_id, **data_)
+                    return self.generate_response(messages['business_updated'], 200)
+                return self.generate_response(messages['forbidden'], 403)
+            return self.null_input(business_data)
+        return self.invalid_json()
 
 
-biz.add_url_rule('', view_func=BusinessManipulation.as_view('businesses'))
+    # def get(self, business_id):
+    #     """return a list of all businesses else a single business"""
+    #     if business_id is None:
+    #         all_busines = Business.query.filter().all()
+    #         print(all_busines)
+    #         response = {'message':'Business is None'}
+    #         return jsonify(response), 201
+    #     else:
+    #         response = {'message':'Business is not'} 
+    #         return jsonify(response), 403
+    
+    # def delete(self, business_id):
+    #     """delete a single business"""
+    #     response = {'message':'Business is None'}
+    #     return jsonify(response), 409
+        
+
+
+business_view = BusinessManipulation.as_view('businesses')
+biz.add_url_rule('', defaults={'business_id':None}, view_func=business_view, methods=['GET',])
+biz.add_url_rule('', view_func=business_view, methods=['POST',])
+biz.add_url_rule('/<int:business_id>', view_func=business_view, methods=['GET', 'PUT', 'DELETE'])
+
+
+# biz.add_url_rule('', view_func=BusinessManipulation.as_view('businesses'))
+# biz.add_url_rule('/<int:category>/<int:location>', view_func=BusinessManipulation.as_view('filter-businesses'))
+# biz.add_url_rule('/<int:business_id>/<int:my>', view_func=business_view, methods=['GET', 'PUT', 'DELETE'])
