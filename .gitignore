@@ -1,4 +1,5 @@
-myenv
+.env
+venv
 .vscode
 **/__Pycache__/*
 .coverage
