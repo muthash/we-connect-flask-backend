@@ -10,20 +10,16 @@ import os
 class Config(object):
     """Parent configuration class"""
     DEBUG = False
-    TESTING = False
     CSRF_ENABLED = True
-    SECRET_KEY = os.environ.get('SECRET')
-    if os.environ.get('DATABASE_URL') is None:
-        SQLALCHEMY_DATABASE_URI = "postgresql://weconnect:weconnect@localhost/weconnect"
-    else:
-        SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
-
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = os.getenv('SECRET')
     JWT_BLACKLIST_ENABLED = True
-    MAIL_DEFAULT_SENDER = os.environ.get('EMAIL')
-    MAIL_PASSWORD = os.environ.get('PASSWORD')
     MAIL_SERVER = 'smtp.gmail.com'
-    MAIL_PORT = 587
+    MAIL_PORT = 465
+    MAIL_USE_SSL = True
+    MAIL_USERNAME = os.environ.get('EMAIL')
+    MAIL_PASSWORD = os.environ.get('PASSWORD')
+    MAIL_DEFAULT_SENDER = os.environ.get('EMAIL')
+    
 
 class DevelopmentConfig(Config):
     """Configurations for Development"""
@@ -34,7 +30,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Configurations for Testing"""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "postgresql://weconnect:weconnect@localhost/test_weconnect"
+    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL')
     DEBUG = True
 
 
