@@ -12,6 +12,8 @@ class Config(object):
     DEBUG = False
     CSRF_ENABLED = True
     SECRET_KEY = os.getenv('SECRET')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_BLACKLIST_ENABLED = True
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465
