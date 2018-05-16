@@ -5,3 +5,4 @@ venv
 .coverage
 htmlcov/
 pylintrc
+.DS_Store
