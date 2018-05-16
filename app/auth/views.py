@@ -3,10 +3,9 @@ from flask import Blueprint, request, jsonify
 from flask.views import MethodView
 from flask_jwt_extended import get_raw_jwt, jwt_required, get_jwt_identity
 from flask_bcrypt import Bcrypt
+
+from app.utils import require_json, check_missing_field, validate_registration, messages
 from app.models import User, BlacklistToken
-from app.utils import (
-    validate_null, random_string, send_reset_password, messages
-)
 from app.base_view import BaseView
 
 auth = Blueprint('auth', __name__, url_prefix='/api/v1')
@@ -14,25 +13,25 @@ auth = Blueprint('auth', __name__, url_prefix='/api/v1')
 
 class RegisterUser(BaseView):
     """Method to Register a new user"""
+    @require_json
     def post(self):
         """Endpoint to save the data to the database"""
-        if not self.invalid_json():
-            data = request.get_json()
-            email = data.get('email')
-            username = data.get('username')
-            password = data.get('password')
-
-            user_data = validate_null(email=email, username=username, password=password)
-            if not self.invalid_null_input(user_data, email):
-                user = User.query.filter_by(email=email).first()
-                if not user:
-                    user = User(email=email, username=username, password=password)
-                    user.save()
-                    return self.generate_response(messages['account_created'], 201)
-                return self.generate_response(messages['exists'], 409)
-            return self.invalid_null_input(user_data, email)
-        return self.invalid_json()
-
+        data = request.get_json()
+        email = data.get('email')
+        username = data.get('username')
+        password = data.get('password')
+        user_data = dict(email=email, username=username, password=password)
+        
+        if check_missing_field(**user_data):
+            return jsonify(check_missing_field(**user_data)), 422
+        if validate_registration(email, username, password):
+            return validate_registration(email, username, password)
+        user = User.query.filter_by(email=email).first()
+        if user:
+            return self.generate_response(messages['exists'], 409)
+        user = User(email=email, username=username, password=password)
+        user.save()
+        return self.generate_response(messages['account_created'], 201)
 
 # class LoginUser(BaseView):
 #     """Method to login a user"""
