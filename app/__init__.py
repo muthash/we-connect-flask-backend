@@ -10,9 +10,9 @@ from flask_mail import Mail
 from instance.config import app_config
 
 
-DB = SQLAlchemy()
-JWT = JWTManager()
-MAIL = Mail()
+db = SQLAlchemy()
+jwt = JWTManager()
+mail = Mail()
 
 
 def create_app(config_name):
@@ -22,8 +22,13 @@ def create_app(config_name):
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
     app.config.from_pyfile('config.py')
-    DB.init_app(app)
-    JWT.init_app(app)
-    MAIL.init_app(app)
+    db.init_app(app)
+    jwt.init_app(app)
+    mail.init_app(app)
+
+    from app.auth.views import auth
+
+
+    app.register_blueprint(auth)
 
     return app
