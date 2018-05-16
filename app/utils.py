@@ -3,8 +3,6 @@ import re, uuid
 from flask import request, jsonify
 from functools import wraps
 from usernames import is_safe_username
-
-from smtplib import SMTPException
 from flask_mail import Message
 from email_validator import validate_email, EmailNotValidError
 from app import mail
@@ -33,7 +31,7 @@ def normalise_email(email):
     return email
 
 def check_username(username):
-    regex = re.compile('^[a-zA-Z0-9_]{4,}$')
+    regex = re.compile('^[a-zA-Z0-9_]{3,}$')
     res = re.match(regex, str(username))
     if not is_safe_username(username):
         response = {'message': "The username you provided is not allowed, " +
@@ -45,13 +43,12 @@ def check_username(username):
         return jsonify(response), 400
 
 def check_password(password):
-    if re.match(r'[a-zA-Z_]+[A-Za-z0-9@#$%^&+=]{8,}', str(password)):
+    if re.match(r'[a-zA-Z_]+[A-Za-z0-9@#!$%^&+=]{8,}', str(password)):
         return False
     response = {'message': 'Password should contain at least eight ' +
                             'characters with at least one digit, one ' +
                             'uppercase letter and one lowercase letter'}
     return jsonify(response), 400
-    
 
 def check_missing_field(**kwargs):
     errors={}
@@ -78,8 +75,14 @@ def validate_registration(email, username, password):
         return check_password(password)
     return False
 
-
-
+def send_reset_password(email, password):
+    """Returns a random string of length string_length"""
+    message = Message(
+        subject='Weconnect Account Password Reset',
+        recipients=[email],
+        html=f'Your new password is: {password}'
+    )
+    mail.send(message)
 
 def random_string(string_length=8):
     """Returns a random string of length string_length"""
@@ -87,32 +90,21 @@ def random_string(string_length=8):
     random = random.replace("-", "")
     return random[:string_length]
 
-def send_reset_password(email, password):
-    """Returns a random string of length string_length"""
-    message = Message(
-        subject='Password Reset',
-        recipients=[email],
-        body='Your new password is: {}'.format(password),
-        html='<a href="https://github.com/muthash" target="_blank">Click link to reset password</a>'
-    )
-    mail.send(message)
-
 def remove_more_spaces(user_input):
     """Maximum number os spaces between words should be one"""
     strip_text = user_input.strip()
     return re.sub(r'\s+', ' ', strip_text)
 
-
 messages = {
     'account_created': 'Account created successfully',
-    'exists': 'User already exists',
-    'valid_email': 'Please enter a valid email address',
+    'exists': 'A User with that email already exists.',
+    'valid_email': 'The email provided is not registered',
     'login': 'Login successfull',
     'valid_epass': 'Invalid email or password',
-    'sent_mail': 'An email has been sent with your new password',
+    'sent_mail': 'Password reset successfull. Check your email for your new password',
     'not_reset': 'Password was not reset. Try again',
-    'password': 'Password changed successfully',
-    'valid_pass': 'Invalid password',
+    'password': 'Password change successfull',
+    'valid_pass': 'Old password entered is not correct',
     'valid_login': 'Please login to continue',
     'delete': 'Account deleted successfully',
     'business_created': 'Business created successfully',
