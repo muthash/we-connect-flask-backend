@@ -1,6 +1,7 @@
 import datetime
 
 from flask_bcrypt import Bcrypt
+from email_validator import validate_email
 from app import db
 
 
@@ -38,18 +39,16 @@ class User(BaseModel):
     password = db.Column(db.String(256), nullable=False)
     registered_on = db.Column(db.DateTime, default=db.func.current_timestamp())
     last_login = db.Column(db.DateTime, default=db.func.current_timestamp())
-    status = db.Column(db.Integer, default=0)
     business_ = db.relationship('Business', backref='owner', cascade="all, delete-orphan", lazy=True)
     user_reviews = db.relationship('Review', backref='reviewer', cascade="all, delete-orphan", lazy=True)
 
-    def __init__(self, email, username, password, status=0):
+    def __init__(self, email, username, password):
         """Initialize the user with the user details"""
         self.email = email
         self.username = username
         self.password = Bcrypt().generate_password_hash(password).decode()
         self.registered_on = datetime.datetime.now()
         self.last_login = datetime.datetime.now()
-        self.status = status
 
     def password_is_valid(self, password):
         """Check the password against its hash"""
