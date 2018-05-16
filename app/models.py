@@ -20,13 +20,11 @@ class BaseModel(db.Model):
         db.session.commit()
 
     @staticmethod
-    def update(class_name, row_id, **kwargs):
+    def update(class_instance, **kwargs):
         """Update selected columns in given row in a table"""
-        row = class_name.query.filter_by(id=row_id).first()
         for column in kwargs:
-            setattr(row, column, kwargs[column])
+            setattr(class_instance, column, kwargs[column])
         db.session.commit()
-
 
 class User(BaseModel):
     """This class defines the users table"""
