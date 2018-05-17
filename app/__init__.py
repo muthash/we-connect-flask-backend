@@ -27,6 +27,9 @@ def create_app(config_name):
     mail.init_app(app)
 
     from app.auth.views import auth
+    from app.business.views import biz
+    from app.reviews.views import rev
+    from app.search.views import search
 
     @app.errorhandler(400)
     def bad_request(error):
@@ -60,5 +63,8 @@ def create_app(config_name):
 
 
     app.register_blueprint(auth)
+    app.register_blueprint(biz)
+    app.register_blueprint(rev)
+    app.register_blueprint(search)
 
     return app
