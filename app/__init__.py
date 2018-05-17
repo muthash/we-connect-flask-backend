@@ -30,6 +30,7 @@ def create_app(config_name):
     from app.business.views import biz
     from app.reviews.views import rev
     from app.search.views import search
+    from app.models import BlacklistToken
 
     @app.errorhandler(400)
     def bad_request(error):
@@ -57,10 +58,12 @@ def create_app(config_name):
 
     @jwt.token_in_blacklist_loader
     def check_if_token_in_blacklist(decrypted_token):
-        """Check if token is blaclisted before allowing access to a route"""
+        """Check if token is blacklisted"""
         jti = decrypted_token['jti']
-        # return jti in blacklist
-
+        blacklist = BlacklistToken.query.filter_by(token=jti).first()
+        if blacklist is None:
+            return False
+        return blacklist.revoked
 
     app.register_blueprint(auth)
     app.register_blueprint(biz)
