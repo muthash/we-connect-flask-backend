@@ -19,7 +19,7 @@ class BaseTestCase(unittest.TestCase):
             db.drop_all()
             db.create_all()
             self.expires = datetime.timedelta(minutes=2)
-            self.token = create_access_token(identity='notuser@mail.com',
+            self.token = create_access_token(identity=100,
                                              expires_delta=self.expires)
 
         self.header = {'Content-Type': 'application/json'}
@@ -31,6 +31,13 @@ class BaseTestCase(unittest.TestCase):
         self.get_login_token(self.reg_data)
         self.passwords = {'old_password': 'Tests12!@',
                           'new_password': 'Test123#$'}
+        self.business_data = {'name': 'Andela', 
+                              'description': 'This Is Andela',
+                              'category': 'IT',
+                              'location': 'Nairobi'}
+        self.biz_res = self.make_request('/api/v1/businesses', 'post',
+                                         data=self.business_data)
+        
         # self.get_login_token(self.reg_data)
         # self.business_data = {'name': 'Andela', 'category': 'IT',
         #                       'location': 'Nairobi'}
