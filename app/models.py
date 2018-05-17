@@ -83,12 +83,12 @@ class Business(BaseModel):
     
     def serialize(self):
         """Return a dictionary"""
-        return {
-            'business_name': self.name,
-            'description': self.description,
-            'category': self.category,
-            'location': self.location
-        }
+        return {self.id: {'business_name': self.name,
+                          'description': self.description,
+                          'category': self.category,
+                          'location': self.location,
+                          'created_by': self.owner.username
+        }}
 
 
     def __repr__(self):
@@ -102,7 +102,7 @@ class Review(BaseModel):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     description = db.Column(db.String(256), nullable=False)
-    rating = db.Column(db.Integer, default=1)
+    rating = db.Column(db.String, default="1")
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(),
@@ -121,7 +121,8 @@ class Review(BaseModel):
         """Return a dictionary"""
         return {
             'review': self.description,
-            'rating': self.rating
+            'rating': self.rating,
+            'date': self.date_created
         }
 
     def __repr__(self):
