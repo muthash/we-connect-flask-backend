@@ -95,6 +95,40 @@ def remove_more_spaces(user_input):
     strip_text = user_input.strip()
     return re.sub(r'\s+', ' ', strip_text)
 
+def remove_none_fields(**kwargs):
+    update_data={}
+    for key in kwargs:
+        if kwargs[key] is not None:
+            update_data[key] = kwargs[key]
+    return update_data
+
+def filter_business(data, category=False, location=False):
+    if category and location:
+        businesses = [business.serialize() for business in data.items 
+                      if (category == business.category and location == business.location)]
+        return return_filter(data, businesses)
+    if category:
+        business = data
+        businesses = [business.serialize() for business in data.items 
+                      if category == business.category]
+        return return_filter(data, businesses)
+    if location:
+        businesses = [business.serialize() for business in data.items 
+                      if location == business.location]
+        return return_filter(data, businesses)
+
+def return_filter(page_items, page_items_list):
+    if page_items_list:
+        next_url = page_items.next_num  if page_items.has_next else None
+        prev_url = page_items.prev_num  if page_items.has_prev else None
+        response = {'businesses': page_items_list,
+                    'next_page': next_url,
+                    'prev_page': prev_url
+        }
+        return jsonify(response), 200
+    response = {'message': f'Your filter criteria did not match any business'}
+    return jsonify(response), 200
+
 messages = {
     'account_created': 'Account created successfully',
     'exists': 'A User with that email already exists.',
@@ -113,5 +147,7 @@ messages = {
     'business_delete': 'Business deleted successfully',
     'businesses': 'The following business are available',
     'no_business': 'There are no businesses registered currently',
-    'not_found': 'Resource not found'
+    'not_found': 'The business was not found',
+    'one_update': 'Enter atleast one input to update',
+    'incorrect': 'Enter correct password to delete'
 }
