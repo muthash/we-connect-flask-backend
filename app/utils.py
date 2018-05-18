@@ -1,4 +1,5 @@
-import re, uuid
+import re
+import uuid
 
 from flask import request, jsonify
 from functools import wraps
@@ -17,6 +18,7 @@ def require_json(func):
         return func(*args, **kwargs)
     return wrapper
 
+
 def check_email(email):
     try:
         validate_email(email, check_deliverability=False)
@@ -25,10 +27,12 @@ def check_email(email):
         response = {'message': str(error)}
         return jsonify(response), 400
 
+
 def normalise_email(email):
     validator_response = validate_email(email, check_deliverability=False)
     email = validator_response["email"]
     return email
+
 
 def check_username(username):
     regex = re.compile('^[a-zA-Z0-9_]{3,}$')
@@ -38,20 +42,23 @@ def check_username(username):
                                "please try again but with a different name."}
         return jsonify(response), 400
     if not res:
-        response = {'message': "The Username should contain atleast four alpha-numeric characters. " +
-                               "The optional special character allowed is _ (underscore)."}
+        response = {'message': "The Username should contain atleast four " +
+                               "alpha-numeric characters. The optional " +
+                               "special character allowed is _ (underscore)."}
         return jsonify(response), 400
+
 
 def check_password(password):
     if re.match(r'[a-zA-Z_]+[A-Za-z0-9@#!$%^&+=]{8,}', str(password)):
         return False
     response = {'message': 'Password should contain at least eight ' +
-                            'characters with at least one digit, one ' +
-                            'uppercase letter and one lowercase letter'}
+                           'characters with at least one digit, one ' +
+                           'uppercase letter and one lowercase letter'}
     return jsonify(response), 400
 
+
 def check_missing_field(**kwargs):
-    errors={}
+    errors = {}
     for key in kwargs:
         if kwargs[key] is None:
             error_key = key + '-error'
@@ -62,6 +69,7 @@ def check_missing_field(**kwargs):
                 error_key = key + '-error'
                 errors[error_key] = f'The {key} should not be empty'
     return errors
+
 
 def validate_registration(email, username, password):
     email = str(email)
@@ -75,6 +83,7 @@ def validate_registration(email, username, password):
         return check_password(password)
     return False
 
+
 def send_reset_password(email, password):
     """Returns a random string of length string_length"""
     message = Message(
@@ -84,49 +93,54 @@ def send_reset_password(email, password):
     )
     mail.send(message)
 
+
 def random_string(string_length=8):
     """Returns a random string of length string_length"""
     random = str(uuid.uuid4())
     random = random.replace("-", "")
     return random[:string_length]
 
+
 def remove_more_spaces(user_input):
     """Maximum number os spaces between words should be one"""
     strip_text = user_input.strip()
     return re.sub(r'\s+', ' ', strip_text)
 
+
 def remove_none_fields(**kwargs):
-    update_data={}
+    update_data = {}
     for key in kwargs:
         if kwargs[key] is not None:
             update_data[key] = kwargs[key]
     return update_data
 
+
 def filter_business(data, category=False, location=False):
     if category and location:
-        businesses = [business.serialize() for business in data.items 
-                      if (category == business.category and location == business.location)]
+        businesses = [business.serialize() for business in data.items
+                      if (category == business.category and
+                          location == business.location)]
         return return_filter(data, businesses)
     if category:
         business = data
-        businesses = [business.serialize() for business in data.items 
+        businesses = [business.serialize() for business in data.items
                       if category == business.category]
         return return_filter(data, businesses)
     if location:
-        businesses = [business.serialize() for business in data.items 
+        businesses = [business.serialize() for business in data.items
                       if location == business.location]
         return return_filter(data, businesses)
 
+
 def return_filter(page_items, page_items_list):
     if page_items_list:
-        next_url = page_items.next_num  if page_items.has_next else None
-        prev_url = page_items.prev_num  if page_items.has_prev else None
+        next_url = page_items.next_num if page_items.has_next else None
+        prev_url = page_items.prev_num if page_items.has_prev else None
         response = {'businesses': page_items_list,
                     'next_page': next_url,
-                    'prev_page': prev_url
-        }
+                    'prev_page': prev_url}
         return jsonify(response), 200
-    response = {'message': f'Your filter criteria did not match any business'}
+    response = {'message': f'The filter criteria did not match any business'}
     return jsonify(response), 200
 
 messages = {
@@ -135,7 +149,8 @@ messages = {
     'valid_email': 'The email provided is not registered',
     'login': 'Login successfull',
     'valid_epass': 'Invalid email or password',
-    'sent_mail': 'Password reset successfull. Check your email for your new password',
+    'sent_mail': 'Password reset successfull. Check your email ' +
+                 'for your new password',
     'not_reset': 'Password was not reset. Try again',
     'password': 'Password change successfull',
     'valid_pass': 'Old password entered is not correct',
