@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/muthash/Weconnect-api.svg?branch=feedback)](https://travis-ci.org/muthash/Weconnect-api)
 [![Coverage Status](https://coveralls.io/repos/github/muthash/Weconnect-api/badge.svg?branch=feedback&service=github)](https://coveralls.io/github/muthash/Weconnect-api?branch=feedback&service=github)
 [![Maintainability](https://api.codeclimate.com/v1/badges/0f8371ef14ba3dc4fa04/maintainability)](https://codeclimate.com/github/muthash/Weconnect-api/maintainability)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/689e408250dd44fdb62c3ca38cd8aa0d)](https://www.codacy.com/app/muthash/Weconnect-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=muthash/Weconnect-api&amp;utm_campaign=Badge_Grade)
 
 # WeConnect
 
