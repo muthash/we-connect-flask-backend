@@ -1,5 +1,5 @@
 import datetime
-from flask import request, jsonify
+from flask import jsonify
 from flask.views import MethodView
 from flask_jwt_extended import create_access_token
 

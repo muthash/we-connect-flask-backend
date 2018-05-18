@@ -1,7 +1,6 @@
 import datetime
 
 from flask_bcrypt import Bcrypt
-from email_validator import validate_email
 from app import db
 
 

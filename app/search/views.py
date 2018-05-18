@@ -1,9 +1,9 @@
 """Contains views to search for businesses"""
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
-from app.models import User,  Business, Review
+from flask_jwt_extended import get_jwt_identity, jwt_optional
+from app.models import Business, Review
 from app.utils import (
-    require_json, check_missing_field, messages,
+    check_missing_field, messages,
     remove_more_spaces, filter_business)
 from app.base_view import BaseView
 

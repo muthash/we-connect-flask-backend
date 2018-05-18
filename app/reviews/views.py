@@ -1,9 +1,9 @@
 """"Contains views to register, login reset password and logout user"""
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import Business, Review
 from app.utils import (
-    require_json, check_missing_field, messages, remove_more_spaces)
+    require_json, check_missing_field, remove_more_spaces)
 from app.base_view import BaseView
 
 rev = Blueprint('rev', __name__,
