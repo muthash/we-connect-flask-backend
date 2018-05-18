@@ -23,7 +23,6 @@ class BaseTestCase(unittest.TestCase):
                                              expires_delta=self.expires)
 
         self.header = {'Content-Type': 'application/json'}
-
         self.reg_data = {'email': 'user@test.com', 'username': 'stephen',
                          'password': 'Tests12!@'}
         self.reg_res = self.make_request('/api/v1/register', 'post',
@@ -31,27 +30,14 @@ class BaseTestCase(unittest.TestCase):
         self.get_login_token(self.reg_data)
         self.passwords = {'old_password': 'Tests12!@',
                           'new_password': 'Test123#$'}
-        self.business_data = {'name': 'Andela', 
+        self.business_data = {'name': 'Andela',
                               'description': 'This Is Andela',
                               'category': 'IT',
                               'location': 'Nairobi'}
         self.biz_res = self.make_request('/api/v1/businesses', 'post',
                                          data=self.business_data)
-        
-        # self.get_login_token(self.reg_data)
-        # self.business_data = {'name': 'Andela', 'category': 'IT',
-        #                       'location': 'Nairobi'}
-        # self.biz_res = self.make_request('/api/v1/businesses', 'post',
-        #                                  data=self.business_data)
-        # self.password = {'password': 'Test1234'}
-
-        # self.review_data = {'review': 'Andela is the BEST. TIA'}
-        # with self.app.app_context():
-        #     self.expires = datetime.timedelta(minutes=2)
-        #     self.token = create_access_token(identity='notuser@mail.com',
-        #                                      expires_delta=self.expires)
-
-        
+        self.review_data = {'description': 'Andela is the BEST. TIA',
+                            'rating': '4'}
 
     def make_request(self, url, method, data):
         """Make a request to the given url with the given method"""
