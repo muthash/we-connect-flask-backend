@@ -50,8 +50,9 @@ class TestRegisterUser(BaseTestCase):
         """Test register with short password length"""
         self.reg_data['username'] = 'in'
         self.register(code=400,
-                      msg="The Username should contain atleast four alpha-numeric characters. " +
-                          "The optional special character allowed is _ (underscore).")
+                      msg="The Username should contain atleast four " +
+                          "alpha-numeric characters. The optional " +
+                          "special character allowed is _ (underscore).")
 
     def test_register_invalid_email(self):
         """Test user registration with an invalid email address"""
@@ -64,14 +65,16 @@ class TestRegisterUser(BaseTestCase):
         del self.header['Content-Type']
         res = self.make_request('/api/v1/register', 'post', self.reg_data)
         result = json.loads(res.data.decode())
-        self.assertEqual(result['message'], "The Request should be JSON format")
+        self.assertEqual(result['message'],
+                         "The Request should be JSON format")
         self.assertEqual(res.status_code, 422)
 
 
 class TestLoginUser(BaseTestCase):
     """Test for Login User endpoint"""
     def login(self, msg, code, key='message'):
-        self.automate('/api/v1/login', key, data=self.reg_data, code=code, msg=msg)
+        self.automate('/api/v1/login', key, data=self.reg_data,
+                      code=code, msg=msg)
 
     def test_user_login(self):
         """Test registered user can login"""
@@ -81,7 +84,7 @@ class TestLoginUser(BaseTestCase):
         """Test user login with empty username"""
         self.reg_data['email'] = "  "
         self.login(key='email-error', code=422,
-                      msg="The email should not be empty")
+                   msg="The email should not be empty")
 
     def test_incorrect_password_login(self):
         """Test incorrect password cannot login"""
@@ -92,6 +95,7 @@ class TestLoginUser(BaseTestCase):
         """Test unregistered user cannot login"""
         self.reg_data['email'] = 'unreg@test.com'
         self.login(code=401, msg='Invalid email or password')
+
 
 class TestLogoutUser(BaseTestCase):
     """Test for Logout User endpoint"""
@@ -106,7 +110,7 @@ class TestResetPassword(BaseTestCase):
     def reset_password(self, code, msg, key='message'):
         self.automate('/api/v1/reset-password', key, data=self.reg_data,
                       code=code, msg=msg)
-    
+
     def test_password_reset(self):
         """Test password reset works as expected"""
         self.reset_password(code=201,
@@ -117,7 +121,7 @@ class TestResetPassword(BaseTestCase):
         """Test reset password with missing email"""
         del self.reg_data['email']
         self.reset_password(key='email-error', code=422,
-                      msg="The email should not be missing")
+                            msg="The email should not be missing")
 
     def test_reset_invalid_email(self):
         """Test reset password with invalid email"""
@@ -128,7 +132,8 @@ class TestResetPassword(BaseTestCase):
     def test_unregistered_user(self):
         """Test password change for unregistered user"""
         self.reg_data['email'] = "notuser@mail.com"
-        self.reset_password(code=401, msg='The email provided is not registered')
+        self.reset_password(code=401,
+                            msg='The email provided is not registered')
 
 
 class TestChangetPassword(BaseTestCase):
@@ -151,12 +156,38 @@ class TestChangetPassword(BaseTestCase):
         """Test change password with short password length"""
         self.passwords['new_password'] = 'short'
         self.change_password(code=400,
-                      msg='Password should contain at least eight characters' +
-                          ' with at least one digit, one uppercase letter' +
-                          ' and one lowercase letter')
+                             msg='Password should contain at least eight ' +
+                                 'characters with at least one digit, one ' +
+                                 'uppercase letter and one lowercase letter')
 
     def test_wrong_initial_password(self):
         """Test change password with incorrect old password"""
         self.passwords['old_password'] = 'wrongpass'
         self.change_password(code=401,
                              msg='Old password entered is not correct')
+
+
+class TestDeleteAccount(BaseTestCase):
+    """Test delete account user endpoint"""
+    def delete_account(self, code, msg, key='message'):
+        self.automate('/api/v1/delete-account', key, data=self.reg_data,
+                      method='delete', code=code, msg=msg)
+
+    def test_delete_account(self):
+        """Test delete account works as expected"""
+        self.delete_account(code=200, msg='Account deleted successfully')
+
+    def test_delete_wrong_password(self):
+        """Test delete account with incorrect password"""
+        self.reg_data['password'] = 'wrong'
+        self.delete_account(code=401,
+                            msg='Old password entered is not correct')
+
+    def test_delete_missing_password(self):
+        """Test delete account with no password"""
+        del self.reg_data['password']
+        self.delete_account(code=422, key='password-error',
+                            msg='The password should not be missing')
+
+if __name__ == "__main__":
+    unittest.main()
