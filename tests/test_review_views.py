@@ -33,11 +33,14 @@ class TestPostReview(BaseTestCase):
             self.create_review(code=422, key="rating-error",
                                msg='The rating should not be missing')
 
-
-class TestGetReview(BaseTestCase):
-    """Test for get reviews endpoint"""
-    def test_get_businesses(self):
+    def test_get_reviews(self):
         """Test get all reviews for a business"""
-        res = self.client.get('/api/v1/businesses/1/reviews')
-        result = json.loads(res.data.decode())
-        self.assertTrue(result['business'])
+        with self.app.app_context():
+            self.reg_data['email'] = 'anotheruser@test.com'
+            self.make_request('/api/v1/register', 'post', data=self.reg_data)
+            self.get_login_token(self.reg_data)
+            self.create_review(code=201,
+                               msg='Review for business with id 1 created')
+            res = self.client.get('/api/v1/businesses/1/reviews')
+            result = json.loads(res.data.decode())
+            self.assertTrue(result['reviews'])
