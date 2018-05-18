@@ -49,13 +49,6 @@ def create_app(config_name):
         return jsonify(dict(error='The HTTP request Method' +
                                   ' is not allowed')), 405
 
-    @app.errorhandler(500)
-    def server_error(error):
-        """Error handler for a server failure"""
-        return jsonify(dict(error='The server encountered an internal error' +
-                                  ' and was unable to' +
-                                  ' complete your request')), 500
-
     @jwt.token_in_blacklist_loader
     def check_if_token_in_blacklist(decrypted_token):
         """Check if token is blacklisted"""
