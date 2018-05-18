@@ -11,7 +11,8 @@ class BaseView(MethodView):
         """Return access token and response to user"""
         response = {
             'message': message,
-            'access_token': create_access_token(identity=user, expires_delta=expires)
+            'access_token': create_access_token(identity=user,
+                                                expires_delta=expires)
         }
         return jsonify(response), 200
 
