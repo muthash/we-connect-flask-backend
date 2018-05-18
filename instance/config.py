@@ -21,7 +21,7 @@ class Config(object):
     MAIL_USERNAME = os.environ.get('EMAIL')
     MAIL_PASSWORD = os.environ.get('PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('EMAIL')
-    
+
 
 class DevelopmentConfig(Config):
     """Configurations for Development"""
