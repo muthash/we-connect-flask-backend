@@ -155,6 +155,13 @@ One can also filter a search result further based on the business location and c
 http://127.0.0.1:5000//api/v1/search?q=Andela&cat=Tech&loc=Nairobi
 ```
 
+## Heroku Production Link
+
+```
+https://wc-app-api.herokuapp.com/
+
+```
+
 ## API Documentation
 
 [Apiary API documentation](https://weconnect15.docs.apiary.io/#)
