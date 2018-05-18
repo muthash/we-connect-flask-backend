@@ -157,6 +157,8 @@ http://127.0.0.1:5000//api/v1/search?q=Andela&cat=Tech&loc=Nairobi
 
 ## API Documentation
 
+[Apiary API documentation](https://weconnect15.docs.apiary.io/#)
+
 ## Authors
 
 * **Stephen Muthama** - [muthash](https://github.com/muthash)
