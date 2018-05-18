@@ -26,6 +26,7 @@ class BaseModel(db.Model):
             setattr(class_instance, column, kwargs[column])
         db.session.commit()
 
+
 class User(BaseModel):
     """This class defines the users table"""
 
@@ -37,8 +38,10 @@ class User(BaseModel):
     password = db.Column(db.String(256), nullable=False)
     registered_on = db.Column(db.DateTime, default=db.func.current_timestamp())
     last_login = db.Column(db.DateTime, default=db.func.current_timestamp())
-    business_ = db.relationship('Business', backref='owner', cascade="all, delete-orphan", lazy=True)
-    user_reviews = db.relationship('Review', backref='reviewer', cascade="all, delete-orphan", lazy=True)
+    business_ = db.relationship('Business', backref='owner',
+                                cascade="all, delete-orphan", lazy=True)
+    user_reviews = db.relationship('Review', backref='reviewer',
+                                   cascade="all, delete-orphan", lazy=True)
 
     def __init__(self, email, username, password):
         """Initialize the user with the user details"""
@@ -71,7 +74,8 @@ class Business(BaseModel):
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    reviews = db.relationship('Review', backref='belongs', cascade="all, delete-orphan", lazy=True)
+    reviews = db.relationship('Review', backref='belongs',
+                              cascade="all, delete-orphan", lazy=True)
 
     def __init__(self, name, description, category, location, user_id):
         """Initialize the business with the businesses details"""
@@ -80,16 +84,14 @@ class Business(BaseModel):
         self.category = category
         self.location = location
         self.user_id = user_id
-    
+
     def serialize(self):
         """Return a dictionary"""
         return {self.id: {'business_name': self.name,
                           'description': self.description,
                           'category': self.category,
                           'location': self.location,
-                          'created_by': self.owner.username
-        }}
-
+                          'created_by': self.owner.username}}
 
     def __repr__(self):
         return 'business: {}'.format(self.name)
@@ -107,7 +109,8 @@ class Review(BaseModel):
     date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
-    business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
+    business_id = db.Column(db.Integer, db.ForeignKey('business.id'),
+                            nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     def __init__(self, description, rating, business_id, user_id):
