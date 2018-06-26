@@ -8,7 +8,7 @@ from app.utils import (
     validate_registration, normalise_email, random_string,
     send_reset_password, messages
 )
-from app.models import User, BlacklistToken
+from app.models import User, Business, BlacklistToken
 from app.base_view import BaseView
 
 auth = Blueprint('auth', __name__, url_prefix='/api/v1')
@@ -152,7 +152,7 @@ class GetUserBusiness(BaseView):
     def get(self):
         user_id = get_jwt_identity()
 
-        business = Business.query.filter_by(user_id=user_id)
+        business = Business.query.filter_by(user_id=user_id).all()
         if business:
             business = [biz.serialize() for biz in business]
             response = {'businesses': business}
