@@ -86,11 +86,14 @@ class Business(BaseModel):
 
     def serialize(self):
         """Return a dictionary"""
-        return {self.id: {'business_name': self.name,
-                          'description': self.description,
-                          'category': self.category,
-                          'location': self.location,
-                          'created_by': self.owner.username}}
+        return {
+            'business_id': self.id,
+            'business_name': self.name,
+            'description': self.description,
+            'category': self.category,
+            'location': self.location,
+            'created_by': self.owner.username
+        }
 
     def __repr__(self):
         return 'business: {}'.format(self.name)
@@ -125,6 +128,7 @@ class Review(BaseModel):
             'review': self.description,
             'rating': self.rating,
             'date': self.date_created
+            'reviewer': self.reviewer.username.
         }
 
     def __repr__(self):
