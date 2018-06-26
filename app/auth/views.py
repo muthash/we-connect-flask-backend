@@ -152,7 +152,7 @@ class GetUserBusiness(BaseView):
     def get(self):
         user_id = get_jwt_identity()
 
-        business = Business.query.filter_by(user_id=user_id)
+        business = Business.query.filter_by(user_id=user_id).all()
         if business:
             business = [biz.serialize() for biz in business]
             response = {'businesses': business}
