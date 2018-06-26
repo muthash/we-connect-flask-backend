@@ -54,7 +54,7 @@ class LoginUser(BaseView):
         email = normalise_email(email)
         user = User.query.filter_by(email=email).first()
         if user and user.password_is_valid(password):
-            return self.generate_token(messages['login'], user.id)
+            return self.generate_token(messages['login'], user)
         return self.generate_response(messages['valid_epass'], 401)
 
 
@@ -146,6 +146,20 @@ class DeleteAccount(BaseView):
         return self.generate_response(messages['delete'], 200)
 
 
+class GetUserBusiness(BaseView):
+    """Method to used to fetch a user's businesses"""
+    @jwt_required
+    def get(self):
+        user_id = get_jwt_identity()
+
+        business = Business.query.filter_by(user_id=user_id)
+        if business:
+            business = [biz.serialize() for biz in business]
+            response = {'businesses': business}
+            return jsonify(response), 200
+        return self.generate_response(messages['no_business'], 404)
+
+
 auth.add_url_rule('/register', view_func=RegisterUser.as_view('register'))
 auth.add_url_rule('/login', view_func=LoginUser.as_view('login'))
 auth.add_url_rule('/logout', view_func=LogoutUser.as_view('logout'))
@@ -155,3 +169,5 @@ auth.add_url_rule('/change-password',
                   view_func=ChangePassword.as_view('change-password'))
 auth.add_url_rule('/delete-account',
                   view_func=DeleteAccount.as_view('delete-account'))
+auth.add_url_rule('/user-business',
+                  view_func=GetUserBusiness.as_view('user-business'))
