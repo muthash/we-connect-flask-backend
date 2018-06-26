@@ -127,8 +127,8 @@ class Review(BaseModel):
         return {
             'review': self.description,
             'rating': self.rating,
-            'date': self.date_created
-            'reviewer': self.reviewer.username.
+            'date': self.date_created,
+            'reviewer': self.reviewer.username
         }
 
     def __repr__(self):
