@@ -4,6 +4,7 @@
 """
 from flask import jsonify
 from flask_api import FlaskAPI
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
@@ -20,6 +21,7 @@ def create_app(config_name):
         loaded up with configuration settings
     """
     app = FlaskAPI(__name__, instance_relative_config=True)
+    cors = CORS(app)
     app.config.from_object(app_config[config_name])
     app.config.from_pyfile('config.py')
     db.init_app(app)
