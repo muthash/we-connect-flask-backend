@@ -105,7 +105,7 @@ class Review(BaseModel):
     __tablename__ = 'reviews'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    description = db.Column(db.String(256), nullable=False)
+    description = db.Column(db.String, nullable=False)
     rating = db.Column(db.String, default="1")
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(
@@ -125,7 +125,7 @@ class Review(BaseModel):
     def serialize(self):
         """Return a dictionary"""
         return {
-            'review_id': self.id
+            'review_id': self.id,
             'review': self.description,
             'rating': self.rating,
             'date': self.date_created,
