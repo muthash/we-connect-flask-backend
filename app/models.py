@@ -125,6 +125,7 @@ class Review(BaseModel):
     def serialize(self):
         """Return a dictionary"""
         return {
+            'review_id': self.id
             'review': self.description,
             'rating': self.rating,
             'date': self.date_created,
