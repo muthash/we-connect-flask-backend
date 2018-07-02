@@ -138,6 +138,7 @@ def return_filter(page_items, page_items_list):
         prev_url = page_items.prev_num if page_items.has_prev else None
         response = {'businesses': page_items_list,
                     'pages': page_items.pages,
+                    'current': page_items.page,
                     'next_page': next_url,
                     'prev_page': prev_url}
         return jsonify(response), 200

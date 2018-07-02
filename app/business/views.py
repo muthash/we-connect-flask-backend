@@ -95,7 +95,7 @@ class BusinessManipulation(BaseView):
             category = request.args.get('cat', "", type=str)
             location = request.args.get('loc', "", type=str)
             page = request.args.get('page', 1, type=int)
-            limit = request.args.get('limit', 2, type=int)
+            limit = request.args.get('limit', 20, type=int)
 
             page_items = Business.query.paginate(page, limit, False)
             if category or location:
@@ -109,6 +109,7 @@ class BusinessManipulation(BaseView):
                 prev_url = page_items.prev_num if page_items.has_prev else None
                 response = {'businesses': page_items_list,
                             'pages': page_items.pages,
+                            'current': page_items.page,
                             'next_page': next_url,
                             'prev_page': prev_url}
                 return jsonify(response), 200
