@@ -15,7 +15,7 @@ class SearchManipulation(BaseView):
         category = request.args.get('cat', "", type=str)
         location = request.args.get('loc', "", type=str)
         page = request.args.get('page', 1, type=int)
-        limit = request.args.get('limit', 2, type=int)
+        limit = request.args.get('limit', 20, type=int)
         search = request.args.get('q', "", type=str)
         data = {'search_parameter': search}
 
@@ -32,7 +32,8 @@ class SearchManipulation(BaseView):
             return filter_business(business, category=category,
                                    location=location)
         businesses = [biz.serialize() for biz in business.items]
-        return jsonify(businesses), 200
+        response = {'businesses': businesses}
+        return jsonify(response), 200
 
 
 search_view = SearchManipulation.as_view('search')
