@@ -65,7 +65,7 @@ class Business(BaseModel):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(50), nullable=False)
-    desc = db.Column(db.String, nullable=True)
+    description = db.Column(db.String, nullable=False)
     category = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100), nullable=False)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
