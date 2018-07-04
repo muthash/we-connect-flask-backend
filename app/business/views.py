@@ -97,7 +97,7 @@ class BusinessManipulation(BaseView):
             page = request.args.get('page', 1, type=int)
             limit = request.args.get('limit', 20, type=int)
 
-            page_items = Business.query.paginate(page, limit, False)
+            page_items = Business.query.order_by(Business.id.desc()).paginate(page, limit, False)
             if category or location:
                 return filter_business(page_items, category=category,
                                        location=location)
