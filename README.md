@@ -5,18 +5,18 @@
 
 # WeConnect
 
-This is an API for WeConnect, a platform that brings businesses and individuals together. This platform creates awareness for businesses and gives the users the ability to:
+This is WeConnect API, a platform that brings businesses and individuals together. This platform creates awareness for businesses and gives the users the ability to:
 
 - Register for an account
-- Login into registered account
+- Log in to your registered account
 - Reset forgotten password
 - Change password
 - Delete user account
 - Register, Update and Delete a Business
 - View all Businesses
-- View single Business
+- View a single Business
 - Write Reviews on a business
-- View all Reviews to a business
+- View all Reviews for a business
 - Search and filter businesses
 
 ## Prerequisites
@@ -48,7 +48,7 @@ $ source venv/bin/activate
 
 ## Dependencies
 
-Install package requirements to your environment.
+Install the package requirements in your environment.
 ```
 pip install -r requirements.txt
 ```
@@ -67,14 +67,14 @@ export EMAIL="email-address-to-use-to-send-mails"
 export PASSWORD="password-for-above-email"
 ```
 
-activate the environment
+Activate the environment
 ```
 source .env
 ```
 
 ## Database migration
 
-Create two Databases in PostgreSQL:
+Create two Databases in Postgresql:
 - wc_db (production DB)
 - test_wc_db (testing DB)
 
@@ -90,20 +90,20 @@ python manager.py db upgrade
 
 ## Testing
 
-To set up unit testing environment:
+To set up the unit testing environment:
 ```
 $ pip install nose
 $ pip install coverage
 ```
 
-To run tests perform the following:
+To run tests, perform the following:
 ```
 $ nosetests --with-coverage
 ```
 
 ## Start The Server
 
-To start the server run the following command
+To start the server, run the following command
 ```
 flask run
 ```
@@ -111,7 +111,7 @@ The server will run on http://127.0.0.1:5000/
 
 ## Testing API on Postman
 
-*Note* Ensure that after you succesfully login a user, you use the generated token in the authorization header for the endpoints that require authentication. Remeber to add Bearer before the token as shown:
+*Note* Ensure that after you successfully log in a user, you use the generated token in the authorization header for the endpoints that require authentication. Remember to add Bearer before the token as shown:
 ```
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9eyJpYXQiO 
 ```
@@ -137,7 +137,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9eyJpYXQiO
 
 ## Pagination
 
-The API enables pagination by passing in *page* and *limit* as arguments in the request url as shown in the following example:
+The API enables pagination by passing in *page* and *limit* as arguments in the request URL, as shown in the following example:
 
 ```
 http://127.0.0.1:5000//api/v1/businesses?page=1&limit=20
@@ -150,7 +150,7 @@ The API implements searching based on the name using a GET parameter *q* as show
 ```
 http://127.0.0.1:5000//api/v1/search?q=Andela
 ```
-One can also filter a search result further based on the business location and category as shown:
+One can also filter a search result further based on the business location and category, as shown:
 ```
 http://127.0.0.1:5000//api/v1/search?q=Andela&cat=Tech&loc=Nairobi
 ```
